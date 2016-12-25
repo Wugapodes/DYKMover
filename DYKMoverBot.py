@@ -153,7 +153,7 @@ approvedText = [
         "==Approved nominations==\n",
         "<!-- This section will hold approved nominations, with the templates "\
         +"transcluded in the same manner as the regular nominations page. "\
-        +"While the exact format of the section has not yet been decided—while"\
+        +"While the exact format of the section has not yet been decided-while"\
         +" it seems unlikely that it will be by date, it may be divided into "\
         +"other sections—it is likely that the oldest approvals will go at the"\
         +" top and the most recent ones at the bottom of each section. -->\n"
@@ -164,7 +164,7 @@ approvedText = [
         "==Approved nominations==\n",
         "<!-- This section will hold approved nominations, with the templates "\
         +"transcluded in the same manner as the regular nominations page. "\
-        +"While the exact format of the section has not yet been decided—while"\
+        +"While the exact format of the section has not yet been decided-while"\
         +" it seems unlikely that it will be by date, it may be divided into "\
         +"other sections—it is likely that the oldest approvals will go at the"\
         +" top and the most recent ones at the bottom of each section. -->\n"
