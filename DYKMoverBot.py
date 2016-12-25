@@ -114,12 +114,12 @@ for line in DYKpage:
     entries.append(line)
     if '==Articles' in line:
         matches=dateRegex.search(line)
-        month = monthConvert(matches.group(1))
+        month = monthConvert(str(matches.group(1)))
         day = int(matches.group(2))
-        date = datetime.date(month=month,day=day,year=2016)
+        dt = datetime.date(month=month,day=day,year=2016)
         section = line
         i+=1
-        dates.append([date,[section]])
+        dates.append([dt,[section]])
     elif 'Did you know nominations/' in line and '<!--' not in line:
         if '}}{{' in line:
             splitLine = line.split('}}{{')
@@ -184,7 +184,8 @@ for line in approvedPage.text.split('\n'):
 # Determine if the bot should write to a live page or the test page. Defaults to 
 #     test page. Value of -1 tests backlog update (not standard because the file
 #     size is very big).
-if live == False:
+if type(live) is str:
+    pass
     page = pywikibot.Page(site,'Template talk:Did you know/Approved')
     page.text=''.join(approvedText[style])
     page.save('moving '+str(len(nonDate))+'tentatively approved nominations '\
@@ -200,3 +201,5 @@ else:
     page.text=''.join(approvedText[1])
     page.save('test of DYKMover, WugBot v'+version+' nosection style')
     page = pywikibot.Page(site,'User:Wugapodes/DYKTest/0')
+    
+print('Done')
