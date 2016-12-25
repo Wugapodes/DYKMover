@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import pywikibot
 import re
 from datetime import date
