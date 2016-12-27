@@ -18,7 +18,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.1.3'
+version = '0.1.4'
 ########
 
 '''
@@ -172,8 +172,6 @@ approvedText = [
     ]
 approvedText[0].append('\n'.join(toPrint))
 approvedText[1].append('\n'.join(nonDate))
-for i in approvedText:
-    approvedText[i][-1]+='\n'
 for line in approvedPage.text.split('\n'):
     if '==Special occasion holding area==' in line:
         passed = 1
