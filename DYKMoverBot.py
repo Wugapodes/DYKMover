@@ -18,7 +18,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.1.0'
+version = '0.1.1'
 ########
 
 '''
@@ -170,7 +170,7 @@ approvedText = [
         +" top and the most recent ones at the bottom of each section. -->\n"
         ]
     ]
-approvedText[0]+=toPrint
+approvedText[0].append('\n'.join(toPrint))
 approvedText[1].append('\n'.join(nonDate))
 for line in approvedPage.text.split('\n'):
     if '==Special occasion holding area==' in line:
