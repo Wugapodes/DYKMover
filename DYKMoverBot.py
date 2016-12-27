@@ -18,7 +18,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.1.1'
+version = '0.1.2'
 ########
 
 '''
