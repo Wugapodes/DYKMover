@@ -18,7 +18,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.1.2'
+version = '0.1.3'
 ########
 
 '''
@@ -177,8 +177,8 @@ for i in approvedText:
 for line in approvedPage.text.split('\n'):
     if '==Special occasion holding area==' in line:
         passed = 1
-        approvedText[0].append(line+'\n')
-        approvedText[1].append(line+'\n')
+        approvedText[0].append('\n'+line+'\n')
+        approvedText[1].append('\n'+line+'\n')
     elif passed == 1:
         approvedText[0].append(line+'\n')
         approvedText[1].append(line+'\n')
