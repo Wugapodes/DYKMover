@@ -18,7 +18,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.2.1'
+version = '0.2.2'
 ########
 
 '''
@@ -99,7 +99,7 @@ def checkPage(title):
         entries.pop()
     elif '[[File:Symbol confirmed.svg|16px]]' in page.text \
     or '[[File:Symbol voting keep.svg|16px]]' in page.text:
-        dates[i][1].append('{{'+templateLink+'}}')
+        dates[-1][1].append('{{'+templateLink+'}}')
         nonDate.append('{{'+templateLink+'}}')
         entries.pop()
 
