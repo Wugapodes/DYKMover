@@ -18,7 +18,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.1.4'
+version = '0.2.0'
 ########
 
 '''
@@ -96,10 +96,22 @@ def checkPage(title):
         dates[i][1].append('{{'+templateLink+'}}')
         nonDate.append('{{'+templateLink+'}}')
         entries.pop()
+
+def mergeNominations(item = ''):
+    global approvedPageDates
+    global dates
+    if item == '':
+        pass
+    else:
+        for entry in approvedPageDates:
+            if dates[item][0] in entry:
+                entry[1]+=dates[item][1][1:]
         
 site = pywikibot.Site('en', 'wikipedia')
 nomPage      = pywikibot.Page(site,'Template talk:Did you know')
-approvedPage = pywikibot.Page(site,'Template talk:Did you know/Approved')
+#approvedPage = pywikibot.Page(site,'Template talk:Did you know/Approved')
+approvedPage = pywikibot.Page(site,'User:Wugapodes/DYKTest/0')
+approvedPage1= pywikibot.Page(site,'User:Wugapodes/DYKTest/1')
 
 dateRegex = re.compile(r'on (.*?) (\d+)=')
 
@@ -139,12 +151,50 @@ for line in DYKpage:
                 problem.append([i+1,line,e])
                 continue
                 
-toPrint=[]
-dates.sort(key=lambda x: x[0])
-for entry in dates:
-    if len(entry[1]) > 1:
-        toPrint+=entry[1]
+approvedPageText = approvedPage.text.split('\n')
+sectionName = ''
+approvedPageDates = []
+oldLine = ''
+datesToRemove = []
+if style < 1:
+    i = -1
+    for line in approvedPageText:
+        if '==Articles' in line:
+            mergeNominations(oldLine)
+            matches=dateRegex.search(line)
+            month = monthConvert(str(matches.group(1)))
+            day = int(matches.group(2))
+            dt = datetime.date(month=month,day=day,year=2016)
+            sectionName = line
+            i+=1
+            for item in dates:
+                if dt in item:
+                    oldLine = dates.index(item)
+                    datesToRemove.append(oldLine)
+                    break
+                else:
+                    continue
+            approvedPageDates.append([dt,[sectionName]])
+        elif 'Did you know nominations/' in line and '<!--' not in line:
+            if '}}{{' in line:
+                splitLine = line.split('}}{{')
+                for title in splitLine:
+                    approvedPageDates[i][1].append('{{'+title+'}}')
+            else:
+                line = line.split('}')[0]
+                approvedPageDates[i][1].append('{{'+title+'}}')
+    dates2 = []
+    for i in datesToRemove:
+        dates2.append(dates[i])
+    newSections = [x for x in dates if x not in dates2 and len(x[1]) > 1]
+    approvedPageDates+=newSections
+    toPrint=[]
+    approvedPageDates.sort(key=lambda x: x[0])
+    for entry in dates:
+        if len(entry[1]) > 1:
+            toPrint+=entry[1]
         
+approvedText2 = approvedPage1.text.split('\n')
 passed = 0
 approvedText = [
         [
@@ -170,16 +220,23 @@ approvedText = [
         +" top and the most recent ones at the bottom of each section. -->\n"
         ]
     ]
+
+for line in approvedText2:
+    if '==Approved nominations==' in line:
+        passed=1
+    elif '==Special occasion holding area==' in line:
+        passed=2
+        approvedText[1].append('\n'.join(nonDate))
+        approvedText[1].append('\n'+line+'\n')
+    elif passed > 0:
+        approvedText[1].append(line+'\n')
 approvedText[0].append('\n'.join(toPrint))
-approvedText[1].append('\n'.join(nonDate))
 for line in approvedPage.text.split('\n'):
     if '==Special occasion holding area==' in line:
         passed = 1
         approvedText[0].append('\n'+line+'\n')
-        approvedText[1].append('\n'+line+'\n')
     elif passed == 1:
         approvedText[0].append(line+'\n')
-        approvedText[1].append(line+'\n')
         
 # Determine if the bot should write to a live page or the test page. Defaults to 
 #     test page. Value of -1 tests backlog update (not standard because the file
