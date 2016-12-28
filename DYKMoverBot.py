@@ -18,7 +18,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.2.0'
+version = '0.2.1'
 ########
 
 '''
@@ -81,6 +81,12 @@ def monthConvert(name):
         else: raise ValueError
             
 def checkPage(title):
+    '''
+    Takes the title of a DYK nom page and loads the wikitext. Looks for a DYK
+    tick that shows it was approved or approved (AGF). If so it adds it to 
+    various lists so that it can be added to the approved page.
+    Returns None, implicitly 
+    '''
     global dates
     global nonDate
     global entries
@@ -98,6 +104,10 @@ def checkPage(title):
         entries.pop()
 
 def mergeNominations(item = ''):
+    '''
+    Takes an index for the list dates and appends the entries in that section
+    to the proper section on the approved page. Returns None, implicitly
+    '''
     global approvedPageDates
     global dates
     if item == '':
@@ -107,6 +117,7 @@ def mergeNominations(item = ''):
             if dates[item][0] in entry:
                 entry[1]+=dates[item][1][1:]
         
+# Load the various pages
 site = pywikibot.Site('en', 'wikipedia')
 nomPage      = pywikibot.Page(site,'Template talk:Did you know')
 #approvedPage = pywikibot.Page(site,'Template talk:Did you know/Approved')
@@ -121,7 +132,7 @@ nonDate = []
 entries = []
 problem = []
 
-i=-1
+# Get approved nominations on the DYK page
 for line in DYKpage:
     entries.append(line)
     if '==Articles' in line:
@@ -130,7 +141,6 @@ for line in DYKpage:
         day = int(matches.group(2))
         dt = datetime.date(month=month,day=day,year=2016)
         section = line
-        i+=1
         dates.append([dt,[section]])
     elif 'Did you know nominations/' in line and '<!--' not in line:
         if '}}{{' in line:
@@ -140,7 +150,7 @@ for line in DYKpage:
                     checkPage(title)
                 except Exception as e:
                     print(e)
-                    problem.append([i+1,line,e])
+                    problem.append([line,e])
                     continue
         else:
             line = line.split('}')[0]
@@ -148,16 +158,17 @@ for line in DYKpage:
                 checkPage(line)
             except Exception as e:
                 print(e)
-                problem.append([i+1,line,e])
+                problem.append([line,e])
                 continue
                 
+# Get the text on the approved page and then update the proper sections
+# with entries newly approved
 approvedPageText = approvedPage.text.split('\n')
 sectionName = ''
 approvedPageDates = []
 oldLine = ''
 datesToRemove = []
 if style < 1:
-    i = -1
     for line in approvedPageText:
         if '==Articles' in line:
             mergeNominations(oldLine)
@@ -166,7 +177,6 @@ if style < 1:
             day = int(matches.group(2))
             dt = datetime.date(month=month,day=day,year=2016)
             sectionName = line
-            i+=1
             for item in dates:
                 if dt in item:
                     oldLine = dates.index(item)
@@ -179,10 +189,10 @@ if style < 1:
             if '}}{{' in line:
                 splitLine = line.split('}}{{')
                 for title in splitLine:
-                    approvedPageDates[i][1].append('{{'+title+'}}')
+                    approvedPageDates[-1][1].append('{{'+title+'}}')
             else:
                 line = line.split('}')[0]
-                approvedPageDates[i][1].append('{{'+title+'}}')
+                approvedPageDates[-1][1].append('{{'+title+'}}')
     dates2 = []
     for i in datesToRemove:
         dates2.append(dates[i])
@@ -194,6 +204,7 @@ if style < 1:
         if len(entry[1]) > 1:
             toPrint+=entry[1]
         
+# Create the page text to be output
 approvedText2 = approvedPage1.text.split('\n')
 passed = 0
 approvedText = [
