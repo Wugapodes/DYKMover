@@ -14,11 +14,11 @@ live = 0
 ########
 # Style: 0 = with date sectionsl 1 = without
 ########
-style = 0
+style = -1
 ########
 # Version Number
 ########
-version = '0.2.2'
+version = '0.2.3'
 ########
 
 '''
@@ -168,7 +168,7 @@ sectionName = ''
 approvedPageDates = []
 oldLine = ''
 datesToRemove = []
-if style < 1:
+if style != 1:
     for line in approvedPageText:
         if '==Articles' in line:
             mergeNominations(oldLine)
@@ -203,6 +203,15 @@ if style < 1:
     for entry in dates:
         if len(entry[1]) > 1:
             toPrint+=entry[1]
+            
+approvedPage1Text = approvedPage1.text.split('\n')
+toRemoveFromNonDate = []
+if style != 0:
+    for line in approvedPage1Text:
+        if line in nonDate:
+            toRemoveFromNonDate.append(line)
+    nonDateTemp = [x for x in nonDate if x not in toRemoveFromNonDate]
+    nonDate = nonDateTemp
         
 # Create the page text to be output
 approvedText2 = approvedPage1.text.split('\n')
