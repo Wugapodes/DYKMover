@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.4.5'
+version = '0.4.6'
 ########
 
 '''
@@ -288,8 +288,6 @@ if style != 1:
     dates2 = []
     for i in datesToRemove:
         dates2.append(dates[i])
-        
-
     newSections = [x for x in dates if x not in dates2 and len(x[1]) > 1]
     approvedPageDates+=newSections
     toPrint=[]
@@ -298,8 +296,6 @@ if style != 1:
         if len(entry[1]) > 1:
             toPrint+=entry[1]
  
-
-           
 approvedPage1Text = approvedPage1.text.split('\n')
 toRemoveFromNonDate = []
 if style != 0:
