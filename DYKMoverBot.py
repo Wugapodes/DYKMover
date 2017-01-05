@@ -4,6 +4,8 @@ import pywikibot
 import re
 from datetime import date
 import datetime
+import logging
+import sys
 
 ########
 # Changing this to 1 makes your changes live on the report page, do not set to
@@ -14,11 +16,11 @@ live = 0
 ########
 # Style: 0 = with date sectionsl 1 = without
 ########
-style = -1
+style = 0
 ########
 # Version Number
 ########
-version = '0.3.0'
+version = '0.4.0'
 ########
 
 '''
@@ -91,27 +93,39 @@ def checkPage(title):
     global nonDate
     global entries
     global problem
-    approved = 0
-    templateLink = title.lstrip('{').rstrip('}')
-    if 'Template:' not in templateLink:
-        templateLink = 'Template:'+templateLink
-    page = pywikibot.Page(site,templateLink)
-    if 'Please do not modify this page.' in page.text:
+    title = title.lstrip('{').rstrip('}')
+    approved = computeNomStatus(title)
+    if approved == -1:
         entries.pop()
+    elif approved == 1:
+        dates[-1][1].append('{{'+title+'}}')
+        nonDate.append('{{'+title+'}}')
+        entries.pop()
+    else:
+        pass
+            
+def computeNomStatus(link,status=0):
+    link = link.lstrip('{').rstrip('}')
+    if 'Template:' not in link:
+        link = 'Template:'+link
+    page = pywikibot.Page(site,link)
+    if 'Please do not modify this page.' in page.text:
+        status=-1
     else:
         for line in page.text.split('\n'):
             if '[[File:Symbol confirmed.svg|16px]]' in line \
             or '[[File:Symbol voting keep.svg|16px]]' in line:
-                approved = 1
+                status = 1
             elif '[[File:Symbol question.svg|16px]]' in line \
             or '[[File:Symbol possible vote.svg|16px]]' in line \
             or '[[File:Symbol delete vote.svg|16px]]' in line \
             or '[[File:Symbol redirect vote 4.svg|16px]]' in line:
-                approved = 0
+                status = 0
         if approved == 1:
-            dates[-1][1].append('{{'+templateLink+'}}')
-            nonDate.append('{{'+templateLink+'}}')
+            dates[-1][1].append('{{'+link+'}}')
+            nonDate.append('{{'+link+'}}')
             entries.pop()
+    return(status)
 
 def mergeNominations(item = ''):
     '''
@@ -139,8 +153,45 @@ def computeYear(oMonth):
         year = cYear
     else:
         year = cYear - 1
+    return(year)
+    
+def startLogging(loglevel):
+    numeric_level = getattr(logging, loglevel.upper(), None)
+    if numeric_level != None:
+        logging.basicConfig(
+            level=numeric_level,
+            filename='Testing.log',
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            datefmt='%Y-%m-%d %I:%M:%S %p'
+        )
+    else:
+        logging.basicConfig(
+            level=logging.WARNING,
+            filename='./log/DYKMoverBot.log',
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            datefmt='%Y-%m-%d %I:%M:%S %p'
+        )
+        logging.warning('Invalid log level \'%s\'. ' \
+                       +'Defaulting to WARNING' % loglevel)
         
+def checkArgs(arg):
+    arg = arg.split('=')
+    if arg[0] == '--log' or arg[0] == '-l':
+        startLogging(arg[1])
+    else:
+        raise ValueError('Unknown command line argument \'%s\'' % arg[0])
+
+# Start log
+for i in range(1,len(sys.argv)):
+    checkArgs(sys.argv[i])
+
+logging.info("### Starting new run ###")
+logging.info("live is set to %s" % live)
+logging.info("style is set to %s" % style)
+logging.info("DYKMoverBot version %s" % version)
+
 # Load the various pages
+logging.info("Loading pages")
 site = pywikibot.Site('en', 'wikipedia')
 nomPage      = pywikibot.Page(site,'Template talk:Did you know')
 #approvedPage = pywikibot.Page(site,'Template talk:Did you know/Approved')
@@ -156,6 +207,7 @@ entries = []
 problem = []
 
 # Get approved nominations on the DYK page
+logging.info("Reading Nomination page")
 for line in DYKpage:
     entries.append(line)
     if '==Articles' in line:
@@ -167,11 +219,19 @@ for line in DYKpage:
         dates.append([dt,[section]])
     elif 'Did you know nominations/' in line and '<!--' not in line:
         if '}}{{' in line:
+            logging.debug("Multiple nominations on one line.\n"\
+                         +"Section: %s" % line)
             splitLine = line.split('}}{{')
             for title in splitLine:
                 try:
                     checkPage(title)
                 except Exception as e:
+                    logging.error(
+                        "Function checkPage did not complete successfully.\n"\
+                        +e+"\n"
+                        +title
+                    )
+                    logging.debug(line)
                     print(e)
                     problem.append([line,e])
                     continue
@@ -180,25 +240,32 @@ for line in DYKpage:
             try:
                 checkPage(line)
             except Exception as e:
+                logging.error(
+                    "Function checkPage did not complete successfully.\n"\
+                    +e+"\n"
+                    +line
+                )
                 print(e)
                 problem.append([line,e])
                 continue
-                
+
 # Get the text on the approved page and then update the proper sections
 # with entries newly approved
+logging.info("Reading Approved page")
 approvedPageText = approvedPage.text.split('\n')
 sectionName = ''
 approvedPageDates = []
 oldLine = ''
 datesToRemove = []
 if style != 1:
+    logging.info("Starting style 0 parsing")
     for line in approvedPageText:
         if '==Articles' in line:
             mergeNominations(oldLine)
             matches=dateRegex.search(line)
             month = monthConvert(str(matches.group(1)))
             day = int(matches.group(2))
-            dt = datetime.date(month=month,day=day,year=2016)
+            dt = datetime.date(month=month,day=day,year=computeYear(month))
             sectionName = line
             for item in dates:
                 if dt in item:
@@ -212,10 +279,12 @@ if style != 1:
             if '}}{{' in line:
                 splitLine = line.split('}}{{')
                 for title in splitLine:
-                    approvedPageDates[-1][1].append('{{'+title+'}}')
+                    if computeNomStatus(title) >= 0:
+                        approvedPageDates[-1][1].append('{{'+title+'}}')
             else:
                 line = line.split('}')[0]
-                approvedPageDates[-1][1].append('{{'+title+'}}')
+                if computeNomStatus(title) >= 0:
+                    approvedPageDates[-1][1].append('{{'+title+'}}')
     dates2 = []
     for i in datesToRemove:
         dates2.append(dates[i])
@@ -230,6 +299,9 @@ if style != 1:
 approvedPage1Text = approvedPage1.text.split('\n')
 toRemoveFromNonDate = []
 if style != 0:
+    logging.info("Starting style 1 parsing.")
+    logging.warning("Style 1 is no longer maintained. "\
+        +"Bot may behave incorrectly or not at all.")
     for line in approvedPage1Text:
         if line in nonDate:
             toRemoveFromNonDate.append(line)
@@ -237,6 +309,7 @@ if style != 0:
     nonDate = nonDateTemp
         
 # Create the page text to be output
+logging.info("Creating output text")
 approvedText2 = approvedPage1.text.split('\n')
 passed = 0
 approvedText = [
