@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.5.0'
+version = '0.5.1'
 ########
 
 '''
@@ -336,17 +336,21 @@ for line in approvedPage.text.split('\n'):
 #     test page. Value of -1 tests backlog update (not standard because the file
 #     size is very big).
 if type(live) is str:
-    pass
     page = pywikibot.Page(site,'Template talk:Did you know/Approved')
-    page.text=''.join(approvedText[style])
+    page.text=''.join(approvedText)
     page.save('moving '+str(len(nonDate))+'tentatively approved nominations '\
               +'from [[WP:DYKN]], WugBot v'+version)
     page = pywikibot.Page(site,'Template talk:Did you know')
-    # This is where the rest of the live stuff will go once I figure out
-    #   how the other bots handle empty sections
+    page.text='\n'.join(entries)
+    page.save(str(len(nonDate))+'approved nominations to [[/Approved|'\
+              +'approved page]], WugBot v'+version)
 else:
     page = pywikibot.Page(site,'User:Wugapodes/DYKTest/0')
     page.text=''.join(approvedText)
     page.save('test of DYKMover, WugBot v'+version)
+    page = pywikibot.Page(site,'User:Wugapodes/DYKTest')
+    page.text='\n'.join(entries)
+    page.save(str(len(nonDate))+'approved nominations to [[/Approved|'\
+              +'approved page]], WugBot v'+version)
     
 print('Done')
