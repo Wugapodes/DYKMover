@@ -228,8 +228,7 @@ for line in DYKpage:
                 except Exception as e:
                     logging.error(
                         "Function checkPage did not complete successfully.\n"\
-                        +e+"\n"
-                        +title
+                        +e+"\n"+title
                     )
                     logging.debug(line)
                     print(e)
@@ -242,8 +241,7 @@ for line in DYKpage:
             except Exception as e:
                 logging.error(
                     "Function checkPage did not complete successfully.\n"\
-                    +e+"\n"\
-                    +line
+                    +e+"\n"+line
                 )
                 print(e)
                 problem.append([line,e])
