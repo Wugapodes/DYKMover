@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.4.6'
+version = '0.4.7'
 ########
 
 '''
@@ -354,33 +354,6 @@ for line in approvedPage.text.split('\n'):
         approvedText[0].append('\n'+line+'\n')
     elif passed == 1:
         approvedText[0].append(line+'\n')
-    
-print('Done')
-
-approvedText = [
-        [
-        "{{/top}}\n",
-        "=Nominations=\n",
-        "==Approved nominations==\n",
-        "<!-- This section will hold approved nominations, with the templates "\
-        +"transcluded in the same manner as the regular nominations page. "\
-        +"While the exact format of the section has not yet been decided-while"\
-        +" it seems unlikely that it will be by date, it may be divided into "\
-        +"other sections-it is likely that the oldest approvals will go at the"\
-        +" top and the most recent ones at the bottom of each section. -->\n"
-        ],
-        [
-        "{{/top}}\n",
-        "=Nominations=\n",
-        "==Approved nominations==\n",
-        "<!-- This section will hold approved nominations, with the templates "\
-        +"transcluded in the same manner as the regular nominations page. "\
-        +"While the exact format of the section has not yet been decided-while"\
-        +" it seems unlikely that it will be by date, it may be divided into "\
-        +"other sections-it is likely that the oldest approvals will go at the"\
-        +" top and the most recent ones at the bottom of each section. -->\n"
-        ]
-    ]
         
 # Determine if the bot should write to a live page or the test page. Defaults to 
 #     test page. Value of -1 tests backlog update (not standard because the file
