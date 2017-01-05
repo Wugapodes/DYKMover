@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.4.3'
+version = '0.4.4'
 ########
 
 '''
@@ -121,7 +121,7 @@ def computeNomStatus(link,status=0):
             or '[[File:Symbol delete vote.svg|16px]]' in line \
             or '[[File:Symbol redirect vote 4.svg|16px]]' in line:
                 status = 0
-        if approved == 1:
+        if status == 1:
             dates[-1][1].append('{{'+link+'}}')
             nonDate.append('{{'+link+'}}')
             entries.pop()
