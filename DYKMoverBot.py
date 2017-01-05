@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.4.1'
+version = '0.4.2'
 ########
 
 '''
@@ -228,7 +228,7 @@ for line in DYKpage:
                 except Exception as e:
                     logging.error(
                         "Function checkPage did not complete successfully.\n"\
-                        +e+"\n"+title
+                        +str(e)+"\n"+title
                     )
                     logging.debug(line)
                     print(e)
@@ -241,7 +241,7 @@ for line in DYKpage:
             except Exception as e:
                 logging.error(
                     "Function checkPage did not complete successfully.\n"\
-                    +e+"\n"+line
+                    +str(e)+"\n"+line
                 )
                 print(e)
                 problem.append([line,e])
