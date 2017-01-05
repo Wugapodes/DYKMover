@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.4.4'
+version = '0.4.5'
 ########
 
 '''
@@ -278,11 +278,17 @@ if style != 1:
                 splitLine = line.split('}}{{')
                 for title in splitLine:
                     if computeNomStatus(title) >= 0:
-                        approvedPageDates[-1][1].append('{{'+title+'}}')
+                        try:
+                            approvedPageDates[-1][1].append('{{'+title+'}}')
+                        except Exception as e:
+                            logging.warning("The approved page is empty?\n"+str(e))
             else:
                 line = line.split('}')[0]
                 if computeNomStatus(title) >= 0:
-                    approvedPageDates[-1][1].append('{{'+title+'}}')
+                    try:
+                        approvedPageDates[-1][1].append('{{'+title+'}}')
+                    except Exception as e:
+                        logging.warning("The approved page is empty?\n"+str(e))
     dates2 = []
     for i in datesToRemove:
         dates2.append(dates[i])
