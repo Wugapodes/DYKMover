@@ -121,10 +121,6 @@ def computeNomStatus(link,status=0):
             or '[[File:Symbol delete vote.svg|16px]]' in line \
             or '[[File:Symbol redirect vote 4.svg|16px]]' in line:
                 status = 0
-        if status == 1:
-            dates[-1][1].append('{{'+link+'}}')
-            nonDate.append('{{'+link+'}}')
-            entries.pop()
     return(status)
 
 def mergeNominations(item = ''):
@@ -182,8 +178,8 @@ def checkArgs(arg):
         raise ValueError('Unknown command line argument \'%s\'' % arg[0])
 
 # Start log
-for i in range(1,len(sys.argv)):
-    checkArgs(sys.argv[i])
+#for i in range(1,len(sys.argv)):
+#    checkArgs(sys.argv[i])
 
 logging.info("### Starting new run ###")
 logging.info("live is set to %s" % live)
@@ -292,6 +288,8 @@ if style != 1:
     dates2 = []
     for i in datesToRemove:
         dates2.append(dates[i])
+        
+
     newSections = [x for x in dates if x not in dates2 and len(x[1]) > 1]
     approvedPageDates+=newSections
     toPrint=[]
@@ -299,7 +297,9 @@ if style != 1:
     for entry in dates:
         if len(entry[1]) > 1:
             toPrint+=entry[1]
-            
+ 
+
+           
 approvedPage1Text = approvedPage1.text.split('\n')
 toRemoveFromNonDate = []
 if style != 0:
@@ -311,6 +311,7 @@ if style != 0:
             toRemoveFromNonDate.append(line)
     nonDateTemp = [x for x in nonDate if x not in toRemoveFromNonDate]
     nonDate = nonDateTemp
+
         
 # Create the page text to be output
 logging.info("Creating output text")
@@ -357,6 +358,33 @@ for line in approvedPage.text.split('\n'):
         approvedText[0].append('\n'+line+'\n')
     elif passed == 1:
         approvedText[0].append(line+'\n')
+    
+print('Done')
+
+approvedText = [
+        [
+        "{{/top}}\n",
+        "=Nominations=\n",
+        "==Approved nominations==\n",
+        "<!-- This section will hold approved nominations, with the templates "\
+        +"transcluded in the same manner as the regular nominations page. "\
+        +"While the exact format of the section has not yet been decided-while"\
+        +" it seems unlikely that it will be by date, it may be divided into "\
+        +"other sections-it is likely that the oldest approvals will go at the"\
+        +" top and the most recent ones at the bottom of each section. -->\n"
+        ],
+        [
+        "{{/top}}\n",
+        "=Nominations=\n",
+        "==Approved nominations==\n",
+        "<!-- This section will hold approved nominations, with the templates "\
+        +"transcluded in the same manner as the regular nominations page. "\
+        +"While the exact format of the section has not yet been decided-while"\
+        +" it seems unlikely that it will be by date, it may be divided into "\
+        +"other sections-it is likely that the oldest approvals will go at the"\
+        +" top and the most recent ones at the bottom of each section. -->\n"
+        ]
+    ]
         
 # Determine if the bot should write to a live page or the test page. Defaults to 
 #     test page. Value of -1 tests backlog update (not standard because the file
