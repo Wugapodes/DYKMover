@@ -91,17 +91,27 @@ def checkPage(title):
     global nonDate
     global entries
     global problem
+    approved = 0
     templateLink = title.lstrip('{').rstrip('}')
     if 'Template:' not in templateLink:
         templateLink = 'Template:'+templateLink
     page = pywikibot.Page(site,templateLink)
     if 'Please do not modify this page.' in page.text:
         entries.pop()
-    elif '[[File:Symbol confirmed.svg|16px]]' in page.text \
-    or '[[File:Symbol voting keep.svg|16px]]' in page.text:
-        dates[-1][1].append('{{'+templateLink+'}}')
-        nonDate.append('{{'+templateLink+'}}')
-        entries.pop()
+    else:
+        for line in page.text.split('\n'):
+            if '[[File:Symbol confirmed.svg|16px]]' in line \
+            or '[[File:Symbol voting keep.svg|16px]]' in line:
+                approved = 1
+            elif '[[File:Symbol question.svg|16px]]' in line \
+            or '[[File:Symbol possible vote.svg|16px]]' in line \
+            or '[[File:Symbol delete vote.svg|16px]]' in line \
+            or '[[File:Symbol redirect vote 4.svg|16px]]' in line:
+                approved = 0
+        if approved == 1:
+            dates[-1][1].append('{{'+templateLink+'}}')
+            nonDate.append('{{'+templateLink+'}}')
+            entries.pop()
 
 def mergeNominations(item = ''):
     '''
