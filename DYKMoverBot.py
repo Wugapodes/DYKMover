@@ -311,10 +311,8 @@ if style != 0:
         
 # Create the page text to be output
 logging.info("Creating output text")
-approvedText2 = approvedPage1.text.split('\n')
 passed = 0
 approvedText = [
-        [
         "{{/top}}\n",
         "=Nominations=\n",
         "==Approved nominations==\n",
@@ -324,36 +322,15 @@ approvedText = [
         +" it seems unlikely that it will be by date, it may be divided into "\
         +"other sections-it is likely that the oldest approvals will go at the"\
         +" top and the most recent ones at the bottom of each section. -->\n"
-        ],
-        [
-        "{{/top}}\n",
-        "=Nominations=\n",
-        "==Approved nominations==\n",
-        "<!-- This section will hold approved nominations, with the templates "\
-        +"transcluded in the same manner as the regular nominations page. "\
-        +"While the exact format of the section has not yet been decided-while"\
-        +" it seems unlikely that it will be by date, it may be divided into "\
-        +"other sections-it is likely that the oldest approvals will go at the"\
-        +" top and the most recent ones at the bottom of each section. -->\n"
-        ]
     ]
 
-for line in approvedText2:
-    if '==Approved nominations==' in line:
-        passed=1
-    elif '==Special occasion holding area==' in line:
-        passed=2
-        approvedText[1].append('\n'.join(nonDate))
-        approvedText[1].append('\n'+line+'\n')
-    elif passed > 0:
-        approvedText[1].append(line+'\n')
-approvedText[0].append('\n'.join(toPrint))
+approvedText.append('\n'.join(toPrint))
 for line in approvedPage.text.split('\n'):
     if '==Special occasion holding area==' in line:
         passed = 1
-        approvedText[0].append('\n'+line+'\n')
+        approvedText.append('\n'+line+'\n')
     elif passed == 1:
-        approvedText[0].append(line+'\n')
+        approvedText.append(line+'\n')
         
 # Determine if the bot should write to a live page or the test page. Defaults to 
 #     test page. Value of -1 tests backlog update (not standard because the file
@@ -369,11 +346,7 @@ if type(live) is str:
     #   how the other bots handle empty sections
 else:
     page = pywikibot.Page(site,'User:Wugapodes/DYKTest/0')
-    page.text=''.join(approvedText[0])
-    page.save('test of DYKMover, WugBot v'+version+' section style')
-    page = pywikibot.Page(site,'User:Wugapodes/DYKTest/1')
-    page.text=''.join(approvedText[1])
-    page.save('test of DYKMover, WugBot v'+version+' nosection style')
-    page = pywikibot.Page(site,'User:Wugapodes/DYKTest/0')
+    page.text=''.join(approvedText)
+    page.save('test of DYKMover, WugBot v'+version)
     
 print('Done')
