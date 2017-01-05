@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.4.7'
+version = '0.5.0'
 ########
 
 '''
