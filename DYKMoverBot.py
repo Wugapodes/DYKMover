@@ -18,7 +18,7 @@ style = -1
 ########
 # Version Number
 ########
-version = '0.2.3'
+version = '0.3.0'
 ########
 
 '''
@@ -126,6 +126,19 @@ def mergeNominations(item = ''):
         for entry in approvedPageDates:
             if dates[item][0] in entry:
                 entry[1]+=dates[item][1][1:]
+                
+def computeYear(oMonth):
+    '''
+    Gives correct year over one year change, ie, for 11 months. Sections older
+    than 11 months will not yield the correct results
+    '''
+    now = datetime.datetime.now()
+    cMonth = now.month
+    cYear = now.year
+    if oMonth <= cMonth:
+        year = cYear
+    else:
+        year = cYear - 1
         
 # Load the various pages
 site = pywikibot.Site('en', 'wikipedia')
@@ -149,7 +162,7 @@ for line in DYKpage:
         matches=dateRegex.search(line)
         month = monthConvert(str(matches.group(1)))
         day = int(matches.group(2))
-        dt = datetime.date(month=month,day=day,year=2016)
+        dt = datetime.date(month=month,day=day,year=computeYear(month))
         section = line
         dates.append([dt,[section]])
     elif 'Did you know nominations/' in line and '<!--' not in line:
