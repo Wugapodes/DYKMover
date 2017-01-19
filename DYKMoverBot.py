@@ -176,8 +176,6 @@ def checkArgs(arg):
         startLogging(arg[1])
     else:
         raise ValueError('Unknown command line argument \'%s\'' % arg[0])
-        
-def writeDYKPage():
 
 # Start log
 #for i in range(1,len(sys.argv)):
