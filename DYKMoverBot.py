@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.6.0'
+version = '1.0.0-dev-0'
 ########
 
 '''
@@ -191,8 +191,7 @@ logging.info("Loading pages")
 site = pywikibot.Site('en', 'wikipedia')
 nomPage      = pywikibot.Page(site,'Template talk:Did you know')
 #approvedPage = pywikibot.Page(site,'Template talk:Did you know/Approved')
-approvedPage = pywikibot.Page(site,'User:Wugapodes/DYKTest/0')
-approvedPage1= pywikibot.Page(site,'User:Wugapodes/DYKTest/1')
+approvedPage = pywikibot.Page(site,'User:Wugapodes/DYKTest/Approved')
 
 dateRegex = re.compile(r'on (.*?) (\d+)=')
 
