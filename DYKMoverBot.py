@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.6.0'
+version = '0.5.1'
 ########
 
 '''
@@ -292,17 +292,9 @@ if style != 1:
     approvedPageDates+=newSections
     toPrint=[]
     approvedPageDates.sort(key=lambda x: x[0])
-    for section in dates:
-        section[1] = set(section[1])
-    for section in approvedPageDates:
-        section[1] = set(section[1])
-    for item in dates:
-        for jtem in approvedPageDates:
-            if item[0] in jtem:
-                jtem[1]=jtem[1].union(item[1])
-    for item in approvedPageDates:
-        for line in item:
-            toPrint.append(line)
+    for entry in dates:
+        if len(entry[1]) > 1:
+            toPrint+=entry[1]
  
 approvedPage1Text = approvedPage1.text.split('\n')
 toRemoveFromNonDate = []
@@ -315,8 +307,6 @@ if style != 0:
             toRemoveFromNonDate.append(line)
     nonDateTemp = [x for x in nonDate if x not in toRemoveFromNonDate]
     nonDate = nonDateTemp
-
-# Merge nominations
 
         
 # Create the page text to be output
