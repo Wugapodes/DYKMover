@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.6.2'
+version = '0.6.3'
 ########
 
 '''
@@ -241,6 +241,11 @@ for line in DYKpage:
                 print(e)
                 problem.append([line,e])
                 continue
+                
+approveddates=[]
+for item in dates:
+    if len(item[-1]) > 1:
+        approveddates.append(item)
 
 # Get the text on the approved page and then update the proper sections
 # with entries newly approved
@@ -260,14 +265,12 @@ if style != 1:
             day = int(matches.group(2))
             dt = datetime.date(month=month,day=day,year=computeYear(month))
             sectionName = line
-            for item in dates:
+            approvedPageDates.append([dt,[sectionName]])
+            for item in approveddates:
                 if dt in item:
-                    oldLine = dates.index(item)
-                    datesToRemove.append(oldLine)
-                    break
+                    approvedPageDates[-1][1]+=item[-1][1:]
                 else:
                     continue
-            approvedPageDates.append([dt,[sectionName]])
         elif 'Did you know nominations/' in line and '<!--' not in line:
             if '}}{{' in line:
                 splitLine = line.split('}}{{')
@@ -285,14 +288,9 @@ if style != 1:
                         approvedPageDates[-1][1].append('{{'+title+'}}')
                     except Exception as e:
                         logging.warning("The approved page is empty?\n"+str(e))
-    dates2 = []
-    for i in datesToRemove:
-        dates2.append(dates[i])
-    newSections = [x for x in dates if x not in dates2 and len(x[1]) > 1]
-    approvedPageDates+=newSections
     toPrint=[]
     approvedPageDates.sort(key=lambda x: x[0])
-    for entry in dates:
+    for entry in approvedPageDates:
         if len(entry[1]) > 1:
             toPrint+=entry[1]
         
