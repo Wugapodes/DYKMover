@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.6.4'
+version = '0.6.5'
 ########
 
 '''
@@ -292,8 +292,8 @@ if style != 1:
                         approvedPageDates[-1][1].append('{{'+title+'}}')
                     except Exception as e:
                         logging.warning("The approved page is empty?\n"+str(e))
-    newSections = [x for x in dates if \
-        any(x[0] not in i for i in approvedPageDates) and len(x[1]) > 1]
+    adts = [x[0] for x in approvedPageDates]
+    newSections = [x for x in dates if x[0] not in adts]
     approvedPageDates+=newSections
     toPrint=[]
     approvedPageDates.sort(key=lambda x: x[0])
