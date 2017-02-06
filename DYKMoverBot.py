@@ -192,7 +192,6 @@ site = pywikibot.Site('en', 'wikipedia')
 nomPage      = pywikibot.Page(site,'Template talk:Did you know')
 approvedPage = pywikibot.Page(site,'Template talk:Did you know/Approved')
 #approvedPage = pywikibot.Page(site,'User:Wugapodes/DYKTest/Approved')
-#approvedPage1= pywikibot.Page(site,'User:Wugapodes/DYKTest/1')
 
 dateRegex = re.compile(r'on (.*?) (\d+)=')
 
@@ -295,19 +294,6 @@ if style != 1:
     for entry in dates:
         if len(entry[1]) > 1:
             toPrint+=entry[1]
- 
-approvedPage1Text = approvedPage1.text.split('\n')
-toRemoveFromNonDate = []
-if style != 0:
-    logging.info("Starting style 1 parsing.")
-    logging.warning("Style 1 is no longer maintained. "\
-        +"Bot may behave incorrectly or not at all.")
-    for line in approvedPage1Text:
-        if line in nonDate:
-            toRemoveFromNonDate.append(line)
-    nonDateTemp = [x for x in nonDate if x not in toRemoveFromNonDate]
-    nonDate = nonDateTemp
-
         
 # Create the page text to be output
 logging.info("Creating output text")
