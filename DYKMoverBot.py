@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.5.1'
+version = '0.6.0'
 ########
 
 '''
@@ -190,9 +190,9 @@ logging.info("DYKMoverBot version %s" % version)
 logging.info("Loading pages")
 site = pywikibot.Site('en', 'wikipedia')
 nomPage      = pywikibot.Page(site,'Template talk:Did you know')
-#approvedPage = pywikibot.Page(site,'Template talk:Did you know/Approved')
-approvedPage = pywikibot.Page(site,'User:Wugapodes/DYKTest/0')
-approvedPage1= pywikibot.Page(site,'User:Wugapodes/DYKTest/1')
+approvedPage = pywikibot.Page(site,'Template talk:Did you know/Approved')
+#approvedPage = pywikibot.Page(site,'User:Wugapodes/DYKTest/Approved')
+#approvedPage1= pywikibot.Page(site,'User:Wugapodes/DYKTest/1')
 
 dateRegex = re.compile(r'on (.*?) (\d+)=')
 
@@ -335,7 +335,7 @@ for line in approvedPage.text.split('\n'):
 # Determine if the bot should write to a live page or the test page. Defaults to 
 #     test page. Value of -1 tests backlog update (not standard because the file
 #     size is very big).
-if type(live) is str:
+if live == 1:
     page = pywikibot.Page(site,'Template talk:Did you know/Approved')
     page.text=''.join(approvedText)
     page.save('moving '+str(len(nonDate))+'tentatively approved nominations '\
