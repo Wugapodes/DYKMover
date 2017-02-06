@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.6.3'
+version = '0.6.4'
 ########
 
 '''
@@ -276,6 +276,8 @@ if style != 1:
                 splitLine = line.split('}}{{')
                 for title in splitLine:
                     if computeNomStatus(title) >= 0:
+                        if '{{'+title+'}}' in approvedPageDates[-1][1]:
+                            continue
                         try:
                             approvedPageDates[-1][1].append('{{'+title+'}}')
                         except Exception as e:
@@ -284,10 +286,15 @@ if style != 1:
                 line = line.split('}')[0]
                 title = line.split('{')[-1]
                 if computeNomStatus(title) >= 0:
+                    if '{{'+title+'}}' in approvedPageDates[-1][1]:
+                        continue
                     try:
                         approvedPageDates[-1][1].append('{{'+title+'}}')
                     except Exception as e:
                         logging.warning("The approved page is empty?\n"+str(e))
+    newSections = [x for x in dates if \
+        any(x[0] not in i for i in approvedPageDates) and len(x[1]) > 1]
+    approvedPageDates+=newSections
     toPrint=[]
     approvedPageDates.sort(key=lambda x: x[0])
     for entry in approvedPageDates:
@@ -330,7 +337,7 @@ if live == 1:
     page.save(str(len(nonDate))+' approved nominations to [[/Approved|'\
               +'approved page]], WugBot v'+version)
 else:
-    page = pywikibot.Page(site,'User:Wugapodes/DYKTest/0')
+    page = pywikibot.Page(site,'User:Wugapodes/DYKTest/Approved')
     page.text=''.join(approvedText)
     page.save('test of DYKMover, WugBot v'+version)
     page = pywikibot.Page(site,'User:Wugapodes/DYKTest')
