@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.6.1'
+version = '0.6.2'
 ########
 
 '''
@@ -279,6 +279,7 @@ if style != 1:
                             logging.warning("The approved page is empty?\n"+str(e))
             else:
                 line = line.split('}')[0]
+                title = line.split('{')[-1]
                 if computeNomStatus(title) >= 0:
                     try:
                         approvedPageDates[-1][1].append('{{'+title+'}}')
