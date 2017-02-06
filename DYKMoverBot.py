@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.6.5'
+version = '0.7.0'
 ########
 
 '''
@@ -292,6 +292,8 @@ if style != 1:
                         approvedPageDates[-1][1].append('{{'+title+'}}')
                     except Exception as e:
                         logging.warning("The approved page is empty?\n"+str(e))
+        if '==Special occasion holding area==' in line:
+            break
     adts = [x[0] for x in approvedPageDates]
     newSections = [x for x in dates if x[0] not in adts]
     approvedPageDates+=newSections
