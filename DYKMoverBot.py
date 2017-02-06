@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.6.0'
+version = '0.6.1'
 ########
 
 '''
@@ -324,11 +324,11 @@ for line in approvedPage.text.split('\n'):
 if live == 1:
     page = pywikibot.Page(site,'Template talk:Did you know/Approved')
     page.text=''.join(approvedText)
-    page.save('moving '+str(len(nonDate))+'tentatively approved nominations '\
+    page.save('moving '+str(len(nonDate))+' tentatively approved nominations '\
               +'from [[WP:DYKN]], WugBot v'+version)
     page = pywikibot.Page(site,'Template talk:Did you know')
     page.text='\n'.join(entries)
-    page.save(str(len(nonDate))+'approved nominations to [[/Approved|'\
+    page.save(str(len(nonDate))+' approved nominations to [[/Approved|'\
               +'approved page]], WugBot v'+version)
 else:
     page = pywikibot.Page(site,'User:Wugapodes/DYKTest/0')
