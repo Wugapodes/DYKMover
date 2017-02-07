@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.7.0'
+version = '0.7.1'
 ########
 
 '''
@@ -330,14 +330,34 @@ for line in approvedPage.text.split('\n'):
 #     test page. Value of -1 tests backlog update (not standard because the file
 #     size is very big).
 if live == 1:
+    abort = 0
     page = pywikibot.Page(site,'Template talk:Did you know/Approved')
-    page.text=''.join(approvedText)
-    page.save('moving '+str(len(nonDate))+' tentatively approved nominations '\
-              +'from [[WP:DYKN]], WugBot v'+version)
-    page = pywikibot.Page(site,'Template talk:Did you know')
-    page.text='\n'.join(entries)
-    page.save(str(len(nonDate))+' approved nominations to [[/Approved|'\
+    if page.text != approvedPage.text:
+        abort = 1
+        logging.error('Approved page has changed, aborting to avoid edit conflict')
+        page = pywikibot.Page(site,'User talk:WugBot')
+        page.text+='I ran into an edit conflict on [[WP:DYKN/A]]'\
+            +'at ~~~~~ and did not write the page to avoid an edit conflict '\
+            +'~~~~'
+        page.save('Posting a note about failed run due to edit conflict')
+    else:
+        page.text=''.join(approvedText)
+    nom = pywikibot.Page(site,'Template talk:Did you know')
+    if nom.text != nomPage.text:
+        abort = 1
+        logging.error('Nom page has changed, aborting to avoid edit conflict')
+        page = pywikibot.Page(site,'User talk:WugBot')
+        page.text+='I ran into an edit conflict on [[WP:DYKN]]'\
+            +'at ~~~~~ and did not write the page to avoid an edit conflict '\
+            +'~~~~'
+        page.save('Posting a note about failed run due to edit conflict')
+    else:
+        nom.text='\n'.join(entries)
+    if abort == 0:
+        nom.save(str(len(nonDate))+' approved nominations to [[/Approved|'\
               +'approved page]], WugBot v'+version)
+        page.save('moving '+str(len(nonDate))+' tentatively approved nominations '\
+              +'from [[WP:DYKN]], WugBot v'+version)
 else:
     page = pywikibot.Page(site,'User:Wugapodes/DYKTest/Approved')
     page.text=''.join(approvedText)
