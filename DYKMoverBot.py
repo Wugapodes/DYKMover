@@ -359,12 +359,37 @@ if live == 1:
         page.save('moving '+str(len(nonDate))+' tentatively approved nominations '\
               +'from [[WP:DYKN]], WugBot v'+version)
 else:
-    page = pywikibot.Page(site,'User:Wugapodes/DYKTest/Approved')
-    page.text=''.join(approvedText)
-    page.save('test of DYKMover, WugBot v'+version)
-    page = pywikibot.Page(site,'User:Wugapodes/DYKTest')
-    page.text='\n'.join(entries)
-    page.save(str(len(nonDate))+'approved nominations to [[/Approved|'\
+    abort = 0
+    page = pywikibot.Page(site,'Template talk:Did you know/Approved')
+    if page.text != approvedPage.text:
+        abort = 1
+        logging.error('Approved page has changed, aborting to avoid edit conflict')
+        page = pywikibot.Page(site,'User talk:WugBot')
+        page.text+='During a test I ran into an edit conflict on [[WP:DYKN/A]]'\
+            +'at ~~~~~ and did not write the page to avoid an edit conflict '\
+            +'~~~~'
+        page.save('Posting a note about failed test run due to edit conflict')
+    else:
+        aText=''.join(approvedText)
+    nom = pywikibot.Page(site,'Template talk:Did you know')
+    if nom.text != nomPage.text:
+        abort = 1
+        logging.error('Nom page has changed, aborting to avoid edit conflict')
+        page = pywikibot.Page(site,'User talk:WugBot')
+        page.text+='During a test I ran into an edit conflict on [[WP:DYKN]]'\
+            +'at ~~~~~ and did not write the page to avoid an edit conflict '\
+            +'~~~~'
+        page.save('Posting a note about failed test run due to edit conflict')
+    else:
+        nText='\n'.join(entries)
+    if abort == 0:
+        page = pywikibot.Page(site,'User:Wugapodes/DYKTest')
+        page.text=nText
+        page.save(str(len(nonDate))+' approved nominations to [[/Approved|'\
               +'approved page]], WugBot v'+version)
+        page = pywikibot.Page(site,'User:Wugapodes/DYKTest/Approved')
+        page.text=aText
+        page.save('moving '+str(len(nonDate))+' tentatively approved nominations '\
+              +'from [[WP:DYKN]], WugBot v'+version)
     
 print('Done')
