@@ -115,7 +115,7 @@ def computeNomStatus(link,status=0):
     	dykchecklist = []
     	dykc = 0
         for line in page.text.split('\n'):
-            if dykc = 1
+            if dykc == 1:
                 dykchecklist.append(line)
                 if '}}' in line:
                     dykc=0
