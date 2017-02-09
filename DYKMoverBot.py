@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.7.1'
+version = '0.7.2'
 ########
 
 '''
@@ -112,7 +112,20 @@ def computeNomStatus(link,status=0):
     if 'Please do not modify this page.' in page.text:
         status=-1
     else:
+    	dykchecklist = []
+    	dykc = 0
         for line in page.text.split('\n'):
+            if dykc = 1
+                dykchecklist.append(line)
+                if '}}' in line:
+                    dykc=0
+                    status = computeDYKChecklistStatus('\n'.join(dykchecklist)
+            elif '{{DYK checklist' in line:
+            	if '}}' in line:
+            		status = computeDYKChecklistStatus(line)
+            	else:
+            	    dykchecklist.append(line)
+            	    dykc = 1
             if '[[File:Symbol confirmed.svg|16px]]' in line \
             or '[[File:Symbol voting keep.svg|16px]]' in line:
                 status = 1
@@ -121,6 +134,9 @@ def computeNomStatus(link,status=0):
             or '[[File:Symbol delete vote.svg|16px]]' in line \
             or '[[File:Symbol redirect vote 4.svg|16px]]' in line:
                 status = 0
+            	
+            	
+            	
     return(status)
 
 def mergeNominations(item = ''):
@@ -176,6 +192,14 @@ def checkArgs(arg):
         startLogging(arg[1])
     else:
         raise ValueError('Unknown command line argument \'%s\'' % arg[0])
+        
+def computeDYKChecklistStatus(template)
+    dykcr = re.compile('status\s*=\s*(?:y|Y)')
+    match = re.search(template,dykcr)
+    if match != None:
+        return(1)
+    else:
+        return(0)
 
 # Start log
 #for i in range(1,len(sys.argv)):
