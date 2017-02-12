@@ -104,7 +104,7 @@ def checkPage(title):
     else:
         pass
             
-def computeNomStatus(link,status=0,pageName):
+def computeNomStatus(link,pageName,status=0):
     global nclosed
     global aclosed
     global pageCnt
