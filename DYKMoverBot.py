@@ -105,18 +105,18 @@ def checkPage(title):
         pass
             
 def computeNomStatus(link,status=0,pageName):
-	global nclosed
-	global aclosed
-	global pageCnt
+    global nclosed
+    global aclosed
+    global pageCnt
     link = link.lstrip('{').rstrip('}')
     if 'Template:' not in link:
         link = 'Template:'+link
     page = pywikibot.Page(site,link)
     if 'Please do not modify this page.' in page.text:
-    	if pageCnt == 0:
-    		nclosed+=1
-    	else:
-    		aclosed+=1
+        if pageCnt == 0:
+            nclosed+=1
+        else:
+            aclosed+=1
         status=-1
     else:
         for line in page.text.split('\n'):
