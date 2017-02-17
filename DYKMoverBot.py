@@ -203,7 +203,7 @@ def checkArgs(arg):
 def computeDYKChecklistStatus(template):
     if type(template) is list:
         template='\n'.join(template)
-    elif type(template) is not str:
+    elif type(template) is not str and type(template) is not unicode:
         raise ValueError('template must be either list or string')
     dykcr = re.compile(r'status\s*=\s*(?:y|Y)')
     match = re.search(dykcr,template)
