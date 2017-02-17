@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.8.1'
+version = '0.8.2'
 ########
 
 '''
@@ -129,7 +129,7 @@ def computeNomStatus(link,status=0):
                 dykchecklist.append(line)
                 if '}}' in line:
                     dykc=0
-                    status = computeDYKChecklistStatus('\n'.join(dykchecklist)
+                    status = computeDYKChecklistStatus('\n'.join(dykchecklist))
             elif '{{DYK checklist' in line:
                 if '}}' in line:
                     status = computeDYKChecklistStatus(line)
@@ -144,9 +144,6 @@ def computeNomStatus(link,status=0):
             or '[[File:Symbol delete vote.svg|16px]]' in line \
             or '[[File:Symbol redirect vote 4.svg|16px]]' in line:
                 status = 0
-                
-                
-                
     return(status)
 
 def mergeNominations(item = ''):
@@ -203,9 +200,13 @@ def checkArgs(arg):
     else:
         raise ValueError('Unknown command line argument \'%s\'' % arg[0])
         
-def computeDYKChecklistStatus(template)
-    dykcr = re.compile('status\s*=\s*(?:y|Y)')
-    match = re.search(template,dykcr)
+def computeDYKChecklistStatus(template):
+    if type(template) is list:
+        template='\n'.join(template)
+    elif type(template) is not str:
+        raise ValueError('template must be either list or string')
+    dykcr = re.compile(r'status\s*=\s*(?:y|Y)')
+    match = re.search(dykcr,template)
     if match != None:
         return(1)
     else:
