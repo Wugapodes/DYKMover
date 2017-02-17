@@ -20,11 +20,11 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.7.2'
+version = '0.8.1'
 ########
 
 '''
-Copyright (c) 2016 Wugpodes
+Copyright (c) 2017 Wugpodes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -93,10 +93,17 @@ def checkPage(title):
     global nonDate
     global entries
     global problem
+    global nclosed
+    global aclosed
+    global pageCnt
     title = title.lstrip('{').rstrip('}')
     approved = computeNomStatus(title)
     if approved == -1:
         entries.pop()
+        if pageCnt == 0:
+            nclosed+=1
+        else:
+            aclosed+=1
     elif approved == 1:
         dates[-1][1].append('{{'+title+'}}')
         nonDate.append('{{'+title+'}}')
@@ -105,6 +112,9 @@ def checkPage(title):
         pass
             
 def computeNomStatus(link,status=0):
+    global nclosed
+    global aclosed
+    global pageCnt
     link = link.lstrip('{').rstrip('}')
     if 'Template:' not in link:
         link = 'Template:'+link
@@ -201,6 +211,61 @@ def computeDYKChecklistStatus(template)
     else:
         return(0)
 
+def writeOut(p):
+    global approvedPage
+    global nomPage
+    global entries
+    global approvedText
+    global nonDate
+    global version
+    global read
+    abort = 0
+    page = pywikibot.Page(site,read+'/Approved')
+    ap = page.text == approvedPage.text
+    nom = pywikibot.Page(site,read)
+    np = nom.text  == nomPage.text
+    if not ap and not np:
+        abort = 1
+        logging.error('Approved page and nom page has changed, '\
+                        +'aborting to avoid edit conflict')
+        page = pywikibot.Page(site,'User talk:WugBot')
+        page.text+='I ran into an edit conflict on both [[WP:DYKN/A]] and [[WP:DYKN]]'\
+            +' at ~~~~~ and did not write either page to avoid an edit conflict '\
+            +'~~~~'
+        page.save('Posting a note about failed test run due to edit conflict')
+        return()
+    if not ap:
+        abort = 1
+        logging.error('Approved page has changed, aborting to avoid edit conflict')
+        page = pywikibot.Page(site,'User talk:WugBot')
+        page.text+='During a test I ran into an edit conflict on [[WP:DYKN/A]]'\
+            +' at ~~~~~ and did not write the page to avoid an edit conflict '\
+            +'~~~~'
+        page.save('Posting a note about failed test run due to edit conflict')
+    else:
+        aText=''.join(approvedText)
+    if not np:
+        abort = 1
+        logging.error('Nom page has changed, aborting to avoid edit conflict')
+        page = pywikibot.Page(site,'User talk:WugBot')
+        page.text+='During a test I ran into an edit conflict on [[WP:DYKN]]'\
+            +' at ~~~~~ and did not write the page to avoid an edit conflict '\
+            +'~~~~'
+        page.save('Posting a note about failed test run due to edit conflict')
+    else:
+        nText='\n'.join(entries)
+    if abort == 0:
+        page = pywikibot.Page(site,p)
+        page.text=nText
+        page.save(str(len(nonDate))+' approved nominations to [[/Approved|'\
+              +'approved page]], removing '+str(nclosed)+' closed nominations,'\
+              +' WugBot v'+version)
+        page = pywikibot.Page(site,p+'/Approved')
+        page.text=aText
+        page.save('moving '+str(len(nonDate))+' tentatively approved nominations '\
+              +'from [[WP:DYKN]], removing '+str(aclosed)+' closed nominations,'\
+              +' WugBot v'+version)
+
 # Start log
 #for i in range(1,len(sys.argv)):
 #    checkArgs(sys.argv[i])
@@ -210,12 +275,21 @@ logging.info("live is set to %s" % live)
 logging.info("style is set to %s" % style)
 logging.info("DYKMoverBot version %s" % version)
 
+if live == -1:
+    read  = 'User:Wugapodes/DYKTest'
+    write = 'User:Wugapodes/DYKTest'
+elif live == 0:
+    read  = 'Template talk:Did you know'
+    write = 'User:Wugapodes/DYKTest'
+elif live == 1:
+    read  = 'Template talk:Did you know'
+    write = 'Template talk:Did you know'
+
 # Load the various pages
 logging.info("Loading pages")
 site = pywikibot.Site('en', 'wikipedia')
-nomPage      = pywikibot.Page(site,'Template talk:Did you know')
-approvedPage = pywikibot.Page(site,'Template talk:Did you know/Approved')
-#approvedPage = pywikibot.Page(site,'User:Wugapodes/DYKTest/Approved')
+nomPage      = pywikibot.Page(site,read)
+approvedPage = pywikibot.Page(site,read+'/Approved')
 
 dateRegex = re.compile(r'on (.*?) (\d+)=')
 
@@ -224,6 +298,9 @@ dates   = []
 nonDate = []
 entries = []
 problem = []
+nclosed = 0
+aclosed = 0
+pageCnt = 0
 
 # Get approved nominations on the DYK page
 logging.info("Reading Nomination page")
@@ -271,6 +348,7 @@ for item in dates:
     if len(item[-1]) > 1:
         approveddates.append(item)
 
+pageCnt = 1
 # Get the text on the approved page and then update the proper sections
 # with entries newly approved
 logging.info("Reading Approved page")
@@ -306,6 +384,11 @@ if style != 1:
                             approvedPageDates[-1][1].append('{{'+title+'}}')
                         except Exception as e:
                             logging.warning("The approved page is empty?\n"+str(e))
+                    else:
+                        if pageCnt == 0:
+                            nclosed+=1
+                        else:
+                            aclosed+=1
             else:
                 line = line.split('}')[0]
                 title = line.split('{')[-1]
@@ -316,6 +399,11 @@ if style != 1:
                         approvedPageDates[-1][1].append('{{'+title+'}}')
                     except Exception as e:
                         logging.warning("The approved page is empty?\n"+str(e))
+                else:
+                    if pageCnt == 0:
+                        nclosed+=1
+                    else:
+                        aclosed+=1
         if '==Special occasion holding area==' in line:
             break
     adts = [x[0] for x in approvedPageDates]
@@ -350,70 +438,6 @@ for line in approvedPage.text.split('\n'):
     elif passed == 1:
         approvedText.append(line+'\n')
         
-# Determine if the bot should write to a live page or the test page. Defaults to 
-#     test page. Value of -1 tests backlog update (not standard because the file
-#     size is very big).
-if live == 1:
-    abort = 0
-    page = pywikibot.Page(site,'Template talk:Did you know/Approved')
-    if page.text != approvedPage.text:
-        abort = 1
-        logging.error('Approved page has changed, aborting to avoid edit conflict')
-        page = pywikibot.Page(site,'User talk:WugBot')
-        page.text+='I ran into an edit conflict on [[WP:DYKN/A]]'\
-            +'at ~~~~~ and did not write the page to avoid an edit conflict '\
-            +'~~~~'
-        page.save('Posting a note about failed run due to edit conflict')
-    else:
-        page.text=''.join(approvedText)
-    nom = pywikibot.Page(site,'Template talk:Did you know')
-    if nom.text != nomPage.text:
-        abort = 1
-        logging.error('Nom page has changed, aborting to avoid edit conflict')
-        page = pywikibot.Page(site,'User talk:WugBot')
-        page.text+='I ran into an edit conflict on [[WP:DYKN]]'\
-            +'at ~~~~~ and did not write the page to avoid an edit conflict '\
-            +'~~~~'
-        page.save('Posting a note about failed run due to edit conflict')
-    else:
-        nom.text='\n'.join(entries)
-    if abort == 0:
-        nom.save(str(len(nonDate))+' approved nominations to [[/Approved|'\
-              +'approved page]], WugBot v'+version)
-        page.save('moving '+str(len(nonDate))+' tentatively approved nominations '\
-              +'from [[WP:DYKN]], WugBot v'+version)
-else:
-    abort = 0
-    page = pywikibot.Page(site,'Template talk:Did you know/Approved')
-    if page.text != approvedPage.text:
-        abort = 1
-        logging.error('Approved page has changed, aborting to avoid edit conflict')
-        page = pywikibot.Page(site,'User talk:WugBot')
-        page.text+='During a test I ran into an edit conflict on [[WP:DYKN/A]]'\
-            +'at ~~~~~ and did not write the page to avoid an edit conflict '\
-            +'~~~~'
-        page.save('Posting a note about failed test run due to edit conflict')
-    else:
-        aText=''.join(approvedText)
-    nom = pywikibot.Page(site,'Template talk:Did you know')
-    if nom.text != nomPage.text:
-        abort = 1
-        logging.error('Nom page has changed, aborting to avoid edit conflict')
-        page = pywikibot.Page(site,'User talk:WugBot')
-        page.text+='During a test I ran into an edit conflict on [[WP:DYKN]]'\
-            +'at ~~~~~ and did not write the page to avoid an edit conflict '\
-            +'~~~~'
-        page.save('Posting a note about failed test run due to edit conflict')
-    else:
-        nText='\n'.join(entries)
-    if abort == 0:
-        page = pywikibot.Page(site,'User:Wugapodes/DYKTest')
-        page.text=nText
-        page.save(str(len(nonDate))+' approved nominations to [[/Approved|'\
-              +'approved page]], WugBot v'+version)
-        page = pywikibot.Page(site,'User:Wugapodes/DYKTest/Approved')
-        page.text=aText
-        page.save('moving '+str(len(nonDate))+' tentatively approved nominations '\
-              +'from [[WP:DYKN]], WugBot v'+version)
+writeOut(write)
     
 print('Done')
