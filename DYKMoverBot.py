@@ -187,7 +187,7 @@ def startLogging(loglevel):
     else:
         logging.basicConfig(
             level=logging.WARNING,
-            filename='./log/DYKMoverBot.log',
+            filename='./logs/DYKMoverBot.log',
             format='%(asctime)s - %(levelname)s - %(message)s',
             datefmt='%Y-%m-%d %I:%M:%S %p'
         )
