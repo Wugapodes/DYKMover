@@ -375,7 +375,7 @@ if style != 1:
                     approvedPageDates[-1][1]+=item[-1][1:]
                 else:
                     continue
-        elif 'Did you know nominations/' in line and '<!--' not in line:
+        elif 'Did you know nominations/' in line.replace('_', ' ') and '<!--' not in line:
             if '}}{{' in line:
                 splitLine = line.split('}}{{')
                 for title in splitLine:
