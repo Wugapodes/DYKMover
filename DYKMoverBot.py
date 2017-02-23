@@ -315,7 +315,7 @@ for line in DYKpage:
         dt = datetime.date(month=month,day=day,year=computeYear(month))
         section = line
         dates.append([dt,[section]])
-    elif 'Did you know nominations/' in line and '<!--' not in line:
+    elif 'Did you know nominations/' in line.replace('_',' ') and '<!--' not in line:
         if '}}{{' in line:
             logging.debug("Multiple nominations on one line.\n"\
                          +"Section: %s" % line)
