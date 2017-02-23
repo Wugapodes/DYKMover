@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.8.2'
+version = '0.8.3'
 ########
 
 '''
@@ -116,6 +116,7 @@ def computeNomStatus(link,status=0):
     global aclosed
     global pageCnt
     link = link.lstrip('{').rstrip('}')
+    link = link.replace('_',' ')
     if 'Template:' not in link:
         link = 'Template:'+link
     page = pywikibot.Page(site,link)
