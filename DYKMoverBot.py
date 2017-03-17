@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.8.3'
+version = '0.9.0'
 ########
 
 '''
@@ -99,7 +99,7 @@ def checkPage(title):
     title = title.lstrip('{').rstrip('}')
     approved = computeNomStatus(title)
     if approved == -1:
-        entries.pop()
+        #entries.pop()
         if pageCnt == 0:
             nclosed+=1
         else:
