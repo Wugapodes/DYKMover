@@ -15,7 +15,7 @@ live = 0
 ########
 # Version Number
 ########
-version = '0.10.1'
+version = '0.10.2'
 ########
 
 class DateHeading():
@@ -53,12 +53,12 @@ class DateHeading():
     def printSection(self,comment=''):
         if len(self.entries) < 1:
             return('')
-        if type(comment) is str() and len(comment) > 0:
+        if len(comment) > 0:
             comment = '<!-- %s -->\n'%comment
         else:
             comment = ''
         header = '\n===Articles created/expanded on %s %d===\n%s'%(monthConvert(self.month),self.day,comment)
-        fmtdEntries = ['{{'+x+'}}}' for x in [y.title for y in self.entries]]
+        fmtdEntries = ['{{'+x+'}}' for x in [y.title for y in self.entries]]
         entries = '\n'.join(fmtdEntries)
         return(header+entries)
 
@@ -178,30 +178,30 @@ def printPage(sectionList,nomPage=False,apText=None):
                         +'this comment).'
             )
             pageOutput += '\n'
-        foot = "==Special occasion holding area==\n'''The holding area has "\
-               +"moved''' to its new location at the bottom of the [[Template "\
-               +"talk:Did you know/Approved#Special occasion holding "\
-               +"area|Approved page]]. Please only place approved templates "\
-               +"there; do not place them below.\n"\
-               +"\n"\
-               +":''Do '''not''' nominate articles in this section—nominate "\
-               +"all articles in the [[Template talk:Did you "\
-               +"know#Nominations|nominations]] section above, under the date "\
-               +"on which the [[WP:DYKTN#article|article]] was created or "\
-               +"moved to mainspace, or the [[WP:DYKTN#expansion|expansion]] "\
-               +"began; indicate in the nomination any request for a "\
-               +"specially timed appearance on the main page.''\n"\
-               +":''Note: Articles nominated for a special occasion should be "\
-               +"nominated (i) within seven days of creation or expansion "\
-               +"(as usual) and (ii) between five days and six weeks before "\
-               +"the occasion, to give reviewers time to check the "\
-               +"nomination. April Fools' Day is an exception to these "\
-               +"requirements; see '''[[Wikipedia:April Fool's Main Page/Did "\
-               +"You Know]]'''.''\n"\
-               +"\n"\
-               +"[[Category:Wikipedia Did you know]]\n"\
-               +"[Category:Main Page discussions]]"
-        pageOutput += foot
+        #foot = "==Special occasion holding area==\n'''The holding area has "\
+        #       +"moved''' to its new location at the bottom of the [[Template "\
+        #       +"talk:Did you know/Approved#Special occasion holding "\
+        #       +"area|Approved page]]. Please only place approved templates "\
+        #       +"there; do not place them below.\n"\
+        #       +"\n"\
+        #       +":''Do '''not''' nominate articles in this section—nominate "\
+        #       +"all articles in the [[Template talk:Did you "\
+        #       +"know#Nominations|nominations]] section above, under the date "\
+        #       +"on which the [[WP:DYKTN#article|article]] was created or "\
+        #       +"moved to mainspace, or the [[WP:DYKTN#expansion|expansion]] "\
+        #       +"began; indicate in the nomination any request for a "\
+        #       +"specially timed appearance on the main page.''\n"\
+        #       +":''Note: Articles nominated for a special occasion should be "\
+        #       +"nominated (i) within seven days of creation or expansion "\
+        #       +"(as usual) and (ii) between five days and six weeks before "\
+        #       +"the occasion, to give reviewers time to check the "\
+        #       +"nomination. April Fools' Day is an exception to these "\
+        #       +"requirements; see '''[[Wikipedia:April Fool's Main Page/Did "\
+        #       +"You Know]]'''.''\n"\
+        #       +"\n"\
+        #       +"[[Category:Wikipedia Did you know]]\n"\
+        #       +"[Category:Main Page discussions]]"
+        #pageOutput += foot
         return(pageOutput)
     elif not nomPage:
         if not apText:
@@ -226,7 +226,7 @@ def printPage(sectionList,nomPage=False,apText=None):
         return(pageOutput)
         
 def writePage(sectionList,site,write,nomPage=False,apText=None):
-    text = printPage(SectionList,nomPage,apText)
+    text = printPage(sectionList,nomPage,apText)
     if not text:
         return(None)
     if not nomPage:
