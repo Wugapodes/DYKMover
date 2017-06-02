@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: UTF-8 -*-
 
 import re
 import logging
@@ -14,7 +15,7 @@ live = 0
 ########
 # Version Number
 ########
-version = '0.10.0'
+version = '0.10.1'
 ########
 
 class DateHeading():
@@ -264,7 +265,7 @@ def main():
     nomPageText = nomPage.text
     nomPageSections = []
     for section in sectionRegEx.findall(nomPageText):
-        nomPageSections.append(DateHeading(section))
+        nomPageSections.append(DateHeading(section,site))
 
     approvedPageText = approvedPage.text
     approvedPageSection = {}
