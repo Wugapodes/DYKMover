@@ -178,30 +178,30 @@ def printPage(sectionList,nomPage=False,apText=None):
                         +'this comment).'
             )
             pageOutput += '\n'
-        #foot = "==Special occasion holding area==\n'''The holding area has "\
-        #       +"moved''' to its new location at the bottom of the [[Template "\
-        #       +"talk:Did you know/Approved#Special occasion holding "\
-        #       +"area|Approved page]]. Please only place approved templates "\
-        #       +"there; do not place them below.\n"\
-        #       +"\n"\
-        #       +":''Do '''not''' nominate articles in this section—nominate "\
-        #       +"all articles in the [[Template talk:Did you "\
-        #       +"know#Nominations|nominations]] section above, under the date "\
-        #       +"on which the [[WP:DYKTN#article|article]] was created or "\
-        #       +"moved to mainspace, or the [[WP:DYKTN#expansion|expansion]] "\
-        #       +"began; indicate in the nomination any request for a "\
-        #       +"specially timed appearance on the main page.''\n"\
-        #       +":''Note: Articles nominated for a special occasion should be "\
-        #       +"nominated (i) within seven days of creation or expansion "\
-        #       +"(as usual) and (ii) between five days and six weeks before "\
-        #       +"the occasion, to give reviewers time to check the "\
-        #       +"nomination. April Fools' Day is an exception to these "\
-        #       +"requirements; see '''[[Wikipedia:April Fool's Main Page/Did "\
-        #       +"You Know]]'''.''\n"\
-        #       +"\n"\
-        #       +"[[Category:Wikipedia Did you know]]\n"\
-        #       +"[Category:Main Page discussions]]"
-        #pageOutput += foot
+        foot = "==Special occasion holding area==\n'''The holding area has "\
+               +"moved''' to its new location at the bottom of the [[Template "\
+               +"talk:Did you know/Approved#Special occasion holding "\
+               +"area|Approved page]]. Please only place approved templates "\
+               +"there; do not place them below.\n"\
+               +"\n"\
+               +":''Do '''not''' nominate articles in this section&mdash;nominate "\
+               +"all articles in the [[Template talk:Did you "\
+               +"know#Nominations|nominations]] section above, under the date "\
+               +"on which the [[WP:DYKTN#article|article]] was created or "\
+               +"moved to mainspace, or the [[WP:DYKTN#expansion|expansion]] "\
+               +"began; indicate in the nomination any request for a "\
+               +"specially timed appearance on the main page.''\n"\
+               +":''Note: Articles nominated for a special occasion should be "\
+               +"nominated (i) within seven days of creation or expansion "\
+               +"(as usual) and (ii) between five days and six weeks before "\
+               +"the occasion, to give reviewers time to check the "\
+               +"nomination. April Fools' Day is an exception to these "\
+               +"requirements; see '''[[Wikipedia:April Fool's Main Page/Did "\
+               +"You Know]]'''.''\n"\
+               +"\n"\
+               +"[[Category:Wikipedia Did you know]]\n"\
+               +"[Category:Main Page discussions]]"
+        pageOutput += foot
         return(pageOutput)
     elif not nomPage:
         if not apText:
