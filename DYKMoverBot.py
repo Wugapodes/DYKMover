@@ -298,7 +298,7 @@ def main():
     approvedSectionList = [approvedPageSection[m][d] for m in approvedPageSection.keys() for d in approvedPageSection[m].keys()]
     approvedSectionList.sort(key=lambda x:x.date)
 
-	nom_req_start = timeit.default_timer()
+    nom_req_start = timeit.default_timer()
     nomPageCheck = pywikibot.Page(site,read)
     nom_req_end = timeit.default_timer()
     if nomPageCheck.text != nomPage.text:
@@ -322,6 +322,6 @@ def main():
     times = [str(x) for x in times]
     
     with open('TimingData.csv','a') as f:
-    	f.write(','.join(times))
+        f.write(','.join(times))
     
 main()
