@@ -227,7 +227,7 @@ def printPage(sectionList,nomPage=False,apText=None):
         pageOutput+=holdingArea
         return(pageOutput)
         
-def writePage(sectionList,site,write,read,check_text,nomPage=False):
+def writePage(sectionList,site,write,check_text,nomPage=False):
     if not nomPage:
         write = write+'/Approved'
         apText = check_text
