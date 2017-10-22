@@ -227,15 +227,25 @@ def printPage(sectionList,nomPage=False,apText=None):
         pageOutput+=holdingArea
         return(pageOutput)
         
-def writePage(sectionList,site,write,nomPage=False,apText=None):
+def writePage(sectionList,site,write,read,check_text,nomPage=False):
     text = printPage(sectionList,nomPage,apText)
     if not text:
         return(None)
     if not nomPage:
         write = write+'/Approved'
+    req_start = timeit.default_timer()
     page = pywikibot.Page(site,write)
-    page.text = text
-    page.save('EditSummary')
+    req_end = timeit.default_timer()
+    if page.text == check_text:
+        page.text = text
+        page.save('EditSummary')
+        write_end = timeit.default_timer()
+        stat = True
+    else:
+        write_end = timeit.default_timer()
+        stat = False
+    return(stat,(req_start,req_end,write_end))
+    
         
 def main():
     global live
@@ -298,30 +308,17 @@ def main():
     approvedSectionList = [approvedPageSection[m][d] for m in approvedPageSection.keys() for d in approvedPageSection[m].keys()]
     approvedSectionList.sort(key=lambda x:x.date)
 
-    nom_req_start = timeit.default_timer()
-    nomPageCheck = pywikibot.Page(site,read)
-    nom_req_end = timeit.default_timer()
-    if nomPageCheck.text != nomPage.text:
-        return(False)
-    writePage(nomPageSections,site,write,True)
-    nom_write_end = timeit.default_timer()
+    nom_stat,nom_times=writePage(nomPageSections,site,write,nomPage.text,True)
+    apr_stat,apr_times=writePage(approvedSectionList,site,write,approvedPage.text)
     
-    app_req_start = timeit.default_timer()
-    approvedPageCheck = pywikibot.Page(site,read+'/Approved')
-    app_req_end = timeit.default_timer()
-    if approvedPageCheck.text != approvedPage.text:
-        return(False)
-    writePage(approvedSectionList,site,write,apText=approvedPage.text)
-    app_write_end = timeit.default_timer()
-    
-    nom_req_time = nom_req_end - nom_req_start
-    app_req_time = app_req_end - nom_req_start
-    nom_write_time = nom_write_end - nom_req_start
-    app_write_time = app_write_end - app_req_start
-    times = [nom_req_time,nom_write_time,app_req_time,app_write_time]
+    nom_write_total = nom_times[2] - nom_times[0]
+    nom_write_proper = nom_times[2] - nom_times[1]
+    apr_write_total = apr_times[2] - apr_times[0]
+    apr_write_proper = apr_times[2] - apr_times[1]
+    times = [nom_write_total,nom_write_proper,apr_write_total,apr_write_proper]
     times = [str(x) for x in times]
     
     with open('TimingData.csv','a') as f:
-        f.write(','.join(times))
+        f.write(','.join(times)+'\n')
     
 main()
