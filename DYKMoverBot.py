@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+__version__ = '0.11.0-dev'
+
 import re
 import timeit
 
@@ -14,10 +16,6 @@ import datetime
 # where this is not default to 0
 ########
 live = 0
-########
-# Version Number
-########
-version = '0.11.0-dev'
 ########
 
 class DateHeading():
@@ -227,13 +225,14 @@ def printPage(sectionList,nomPage=False,apText=None):
         pageOutput+=holdingArea
         return(pageOutput)
         
-def writePage(sectionList,site,write,check_text,nomPage=False):
+def writePage(sectionList,site,write,check_text,nomPage=False,editsum=summary):
     if not nomPage:
         write = write+'/Approved'
         apText = check_text
     else:
         apText = None
     text = printPage(sectionList,nomPage,apText)
+    editSum = compute_edit_summary(sectionList)
     if not text:
         return(None)
     req_start = timeit.default_timer()
@@ -241,14 +240,13 @@ def writePage(sectionList,site,write,check_text,nomPage=False):
     req_end = timeit.default_timer()
     if page.text == check_text:
         page.text = text
-        page.save('EditSummary')
+        page.save(summary)
         write_end = timeit.default_timer()
         stat = True
     else:
         write_end = timeit.default_timer()
         stat = False
     return(stat,(req_start,req_end,write_end))
-    
         
 def main():
     global live
@@ -291,8 +289,10 @@ def main():
         if sect.day not in approvedPageSection[sect.month]:
             approvedPageSection[sect.month][sect.day] = sect
         
+    approved_num = 0
     for section in nomPageSections:
         toApproved = [entry for entry in section.entries if entry.approved]
+        approved_num+=len(toApproved)
         stayOnNom  = [entry for entry in section.entries if not entry.approved]
         
         day = section.day
@@ -307,12 +307,14 @@ def main():
             approvedEntries = approvedPageSection[month][day].entries + toApproved
             approvedPageSection[month][day].setEntries(approvedEntries)
             
+    editsum = 'Moving '+str(approved_num)+' approved nominations to '\
+        +'[[/Approved|approved page]]. WugBot v'+__version__
     nomPageSections.sort(key=lambda x:x.date)
     approvedSectionList = [approvedPageSection[m][d] for m in approvedPageSection.keys() for d in approvedPageSection[m].keys()]
     approvedSectionList.sort(key=lambda x:x.date)
 
-    nom_stat,nom_times=writePage(nomPageSections,site,write,nomPage.text,True)
-    apr_stat,apr_times=writePage(approvedSectionList,site,write,approvedPage.text)
+    nom_stat,nom_times=writePage(nomPageSections,site,write,nomPage.text,True,editsum=editsum)
+    apr_stat,apr_times=writePage(approvedSectionList,site,write,approvedPage.text,editsum=editsum)
     
     nom_write_total = nom_times[2] - nom_times[0]
     nom_write_proper = nom_times[2] - nom_times[1]
