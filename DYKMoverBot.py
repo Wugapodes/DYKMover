@@ -17,6 +17,7 @@ import datetime
 ########
 live = 0
 ########
+rm_closed = True
 
 class DateHeading():
     def __init__(self,section,site):
@@ -225,14 +226,13 @@ def printPage(sectionList,nomPage=False,apText=None):
         pageOutput+=holdingArea
         return(pageOutput)
         
-def writePage(sectionList,site,write,check_text,nomPage=False,editsum=summary):
+def writePage(sectionList,site,write,check_text,nomPage=False,summary='WugBot'):
     if not nomPage:
         write = write+'/Approved'
         apText = check_text
     else:
         apText = None
     text = printPage(sectionList,nomPage,apText)
-    editSum = compute_edit_summary(sectionList)
     if not text:
         return(None)
     req_start = timeit.default_timer()
@@ -250,6 +250,7 @@ def writePage(sectionList,site,write,check_text,nomPage=False,editsum=summary):
         
 def main():
     global live
+    global rm_closed
     #logging.info("Loading pages")
     site    = pywikibot.Site('en', 'wikipedia')
 
@@ -290,10 +291,16 @@ def main():
             approvedPageSection[sect.month][sect.day] = sect
         
     approved_num = 0
+    closed_num = 0
     for section in nomPageSections:
         toApproved = [entry for entry in section.entries if entry.approved]
         approved_num+=len(toApproved)
-        stayOnNom  = [entry for entry in section.entries if not entry.approved]
+        if rm_closed:
+            stayOnNom = [e for e in section.entries if not e.approved and not e.closed]
+        else:
+            stayOnNom  = [entry for entry in section.entries if not entry.approved]
+        noms_closed += len([x for x in section.entries if x.closed])
+        section.entries = stayOnNom
         
         day = section.day
         month = section.month
@@ -307,14 +314,21 @@ def main():
             approvedEntries = approvedPageSection[month][day].entries + toApproved
             approvedPageSection[month][day].setEntries(approvedEntries)
             
+    if closed_num > 0:
+        if rm_closed:
+            c_msg = str(closed_num)+' closed nominations removed.'
+        else:
+            c_msg = str(closed_num)+' closed nominations not removed.'
+    else:
+        c_msg=''
     editsum = 'Moving '+str(approved_num)+' approved nominations to '\
-        +'[[/Approved|approved page]]. WugBot v'+__version__
+        +'[[/Approved|approved page]]. '+c_msg+' WugBot v'+__version__
     nomPageSections.sort(key=lambda x:x.date)
     approvedSectionList = [approvedPageSection[m][d] for m in approvedPageSection.keys() for d in approvedPageSection[m].keys()]
     approvedSectionList.sort(key=lambda x:x.date)
 
-    nom_stat,nom_times=writePage(nomPageSections,site,write,nomPage.text,True,editsum=editsum)
-    apr_stat,apr_times=writePage(approvedSectionList,site,write,approvedPage.text,editsum=editsum)
+    nom_stat,nom_times=writePage(nomPageSections,site,write,nomPage.text,True,summary=editsum)
+    apr_stat,apr_times=writePage(approvedSectionList,site,write,approvedPage.text,summary=editsum)
     
     nom_write_total = nom_times[2] - nom_times[0]
     nom_write_proper = nom_times[2] - nom_times[1]
