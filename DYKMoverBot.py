@@ -228,11 +228,14 @@ def printPage(sectionList,nomPage=False,apText=None):
         return(pageOutput)
         
 def writePage(sectionList,site,write,read,check_text,nomPage=False):
+    if not nomPage:
+        write = write+'/Approved'
+        apText = check_text
+    else:
+        apText = None
     text = printPage(sectionList,nomPage,apText)
     if not text:
         return(None)
-    if not nomPage:
-        write = write+'/Approved'
     req_start = timeit.default_timer()
     page = pywikibot.Page(site,write)
     req_end = timeit.default_timer()
