@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-__version__ = '0.11.0-dev'
+__version__ = '0.11.0'
 
 import re
 import timeit
@@ -295,11 +295,11 @@ def main():
     for section in nomPageSections:
         toApproved = [entry for entry in section.entries if entry.approved]
         approved_num+=len(toApproved)
+        closed_num += len([x for x in section.entries if x.closed])
         if rm_closed:
             stayOnNom = [e for e in section.entries if not e.approved and not e.closed]
         else:
             stayOnNom  = [entry for entry in section.entries if not entry.approved]
-        noms_closed += len([x for x in section.entries if x.closed])
         section.entries = stayOnNom
         
         day = section.day
