@@ -2,6 +2,8 @@
 # -*- coding: UTF-8 -*-
 
 import re
+import timeit
+
 import logging
 import pywikibot
 import datetime
@@ -15,7 +17,7 @@ live = 0
 ########
 # Version Number
 ########
-version = '0.10.2'
+version = '0.11.0-dev'
 ########
 
 class DateHeading():
@@ -296,14 +298,30 @@ def main():
     approvedSectionList = [approvedPageSection[m][d] for m in approvedPageSection.keys() for d in approvedPageSection[m].keys()]
     approvedSectionList.sort(key=lambda x:x.date)
 
+	nom_req_start = timeit.default_timer()
     nomPageCheck = pywikibot.Page(site,read)
-    approvedPageCheck = pywikibot.Page(site,read+'/Approved')
-
+    nom_req_end = timeit.default_timer()
     if nomPageCheck.text != nomPage.text:
         return(False)
+    writePage(nomPageSections,site,write,True)
+    nom_write_end = timeit.default_timer()
+    
+    app_req_start = timeit.default_timer()
+    approvedPageCheck = pywikibot.Page(site,read+'/Approved')
+    app_req_end = timeit.default_timer()
     if approvedPageCheck.text != approvedPage.text:
         return(False)
-    writePage(nomPageSections,site,write,True)
     writePage(approvedSectionList,site,write,apText=approvedPage.text)
+    app_write_end = timeit.default_timer()
+    
+    nom_req_time = nom_req_end - nom_req_start
+    app_req_time = app_req_end - nom_req_start
+    nom_write_time = nom_write_end - nom_req_start
+    app_write_time = app_write_end - app_req_start
+    times = [nom_req_time,nom_write_time,app_req_time,app_write_time]
+    times = [str(x) for x in times]
+    
+    with open('TimingData.csv','a') as f:
+    	f.write(','.join(times))
     
 main()
