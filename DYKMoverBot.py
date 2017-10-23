@@ -318,7 +318,8 @@ def main():
     approved_num = 0
     closed_num = 0
     
-    for section in nomPageSections:
+    for i in range(len(nomPageSections)):
+        section = nomPageSections[i]
         toApproved = [entry for entry in section.entries if entry.approved]
         approved_num+=len(toApproved)
         closed_num += len([x for x in section.entries if x.closed])
@@ -339,6 +340,7 @@ def main():
         else:
             approvedEntries = approvedPageSection[month][day].entries + toApproved
             approvedPageSection[month][day].setEntries(approvedEntries)
+        nomPageSections[i] = section
             
     if closed_num > 0:
         if rm_closed:
