@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-__version__ = '0.11.0'
+__version__ = '0.11.1-dev'
 
 import re
 import timeit
@@ -15,18 +15,19 @@ import datetime
 # live mode unless you have been approved for bot usage. Do not merge commits 
 # where this is not default to 0
 ########
-live = 0
+live = -1
 ########
 rm_closed = True
 
 class DateHeading():
-    def __init__(self,section,site):
+    def __init__(self,section,site,old):
         self.month   = monthConvert(section[0])
         self.day     = int(section[1])
         self.year    = self.computeYear()
         self.date    = datetime.date(month=self.month,day=self.day,year=self.year)
         rawEntry     = section[2]
         self.entries = []
+        self.old = old
         entryRegEx   = re.compile(
                     r'{{(.*?)}}'
                     )
@@ -165,13 +166,26 @@ def monthConvert(name):
         elif name == 12: return('December')
         else: raise ValueError
         
-def printPage(sectionList,nomPage=False,apText=None):
+def printPage(sectionList,nomPage=False,apText=None,backlog=False):
     pageOutput = ''
     if nomPage:
         head = '{{Template talk:Did you know/Header}}\n\n'\
         +'=Nominations=\n==Older nominations==\n\n'
+        if backlog:
+            head = '{{backlog}}\n'+head
         pageOutput += head
-        for section in sectionList:
+        old_noms = [x for x in sectionList if x.old]
+        current_noms = [x for x in sectionList if not x.old]
+        for section in old_noms:
+            pageOutput += section.printSection(
+                comment='After you have created your nomination page, please '\
+                        +'add it (e.g., {{Did you know nominations/YOUR '\
+                        +'ARTICLE TITLE}}) to the TOP of this section (after '\
+                        +'this comment).'
+            )
+            pageOutput += '\n'
+        pageOutput += '==Current nominations<!-- automatically moved by bot -->=='
+        for section in current_noms:
             pageOutput += section.printSection(
                 comment='After you have created your nomination page, please '\
                         +'add it (e.g., {{Did you know nominations/YOUR '\
@@ -226,13 +240,13 @@ def printPage(sectionList,nomPage=False,apText=None):
         pageOutput+=holdingArea
         return(pageOutput)
         
-def writePage(sectionList,site,write,check_text,nomPage=False,summary='WugBot'):
+def writePage(sectionList,site,write,check_text,nomPage=False,summary='WugBot',backlog=False):
     if not nomPage:
         write = write+'/Approved'
         apText = check_text
     else:
         apText = None
-    text = printPage(sectionList,nomPage,apText)
+    text = printPage(sectionList,nomPage,apText,backlog=backlog)
     if not text:
         return(None)
     req_start = timeit.default_timer()
@@ -272,14 +286,22 @@ def main():
     nomPage = pywikibot.Page(site,read)
     approvedPage = pywikibot.Page(site,read+'/Approved')
 
+    old_nom_regex = re.compile(r'==Older nominations==\n((.*\n)*)==Current nominations')
+    current_regex = re.compile(r'==Current nominations.*?==\n((.*\n)*)==Special')
     sectionRegEx = re.compile(
                         r'===.*? on (.*?) (\d+)===\n(?:|<!--.*?-->)(?:|\n+)({{(?:.*\n)+?)(?===)'
                         )
 
     nomPageText = nomPage.text
+    if backlog in nomPageText:
+        backlog = True
     nomPageSections = []
-    for section in sectionRegEx.findall(nomPageText):
-        nomPageSections.append(DateHeading(section,site))
+    old_noms = old_nom_regex.search(nomPageText).group(1)
+    current_noms = current_regex.search(nomPageText).group(1)
+    for section in sectionRegEx.findall(old_noms):
+        nomPageSections.append(DateHeading(section,site,True))
+    for section in sectionRegEx.findall(current_noms):
+        nomPageSections.append(DateHeading(section,site,False))
 
     approvedPageText = approvedPage.text
     approvedPageSection = {}
@@ -326,8 +348,20 @@ def main():
     nomPageSections.sort(key=lambda x:x.date)
     approvedSectionList = [approvedPageSection[m][d] for m in approvedPageSection.keys() for d in approvedPageSection[m].keys()]
     approvedSectionList.sort(key=lambda x:x.date)
-
-    nom_stat,nom_times=writePage(nomPageSections,site,write,nomPage.text,True,summary=editsum)
+    
+    if '{{backlog}}' in nomPageText:
+        backlog = True
+    else:
+        backlog = False
+    nom_stat,nom_times=writePage(
+                                nomPageSections,
+                                site,
+                                write,
+                                nomPage.text,
+                                True,
+                                summary=editsum,
+                                backlog=backlog
+                                )
     apr_stat,apr_times=writePage(approvedSectionList,site,write,approvedPage.text,summary=editsum)
     
     nom_write_total = nom_times[2] - nom_times[0]
