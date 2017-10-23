@@ -55,6 +55,7 @@ class DateHeading():
         
     def printSection(self,comment=''):
         if len(self.entries) < 1:
+            print(self.title)
             return('')
         if len(comment) > 0:
             comment = '<!-- %s -->\n'%comment
@@ -63,6 +64,7 @@ class DateHeading():
         header = '\n===Articles created/expanded on %s %d===\n%s'%(monthConvert(self.month),self.day,comment)
         fmtdEntries = ['{{'+x+'}}' for x in [y.title for y in self.entries]]
         entries = '\n'.join(fmtdEntries)
+        print(self.title,len(entries),entries)
         return(header+entries)
 
 
@@ -178,6 +180,7 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
         old_noms = [x for x in sectionList if x.old]
         current_noms = [x for x in sectionList if not x.old]
         for section in old_noms:
+            print(section.title)
             pageOutput += section.printSection(
                 comment='After you have created your nomination page, please '\
                         +'add it (e.g., {{Did you know nominations/YOUR '\
@@ -187,6 +190,7 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
             pageOutput += '\n'
         pageOutput += '==Current nominations<!-- automatically moved by bot -->=='
         for section in current_noms:
+            print(section.title)
             pageOutput += section.printSection(
                 comment='After you have created your nomination page, please '\
                         +'add it (e.g., {{Did you know nominations/YOUR '\
@@ -314,15 +318,7 @@ def main():
     approved_num = 0
     closed_num = 0
     
-    #DIAGNOSTIC#
-    sectionDebug = [x.title for x in nomPageSections]
-    print(sectionDebug)
     for section in nomPageSections:
-        print(section.title)
-        print([(x.title,x.approved) for x in section.entries])
-        print([(x.title,x.closed) for x in section.entries])
-        print([e.title for e in section.entries if not e.approved and not e.closed])
-        #DIAGNOSTIC#
         toApproved = [entry for entry in section.entries if entry.approved]
         approved_num+=len(toApproved)
         closed_num += len([x for x in section.entries if x.closed])
