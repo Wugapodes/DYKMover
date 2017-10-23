@@ -20,7 +20,7 @@ live = -1
 rm_closed = True
 
 class DateHeading():
-    def __init__(self,section,site,old):
+    def __init__(self,section,site,old=None):
         self.month   = monthConvert(section[0])
         self.day     = int(section[1])
         self.year    = self.computeYear()
@@ -28,6 +28,7 @@ class DateHeading():
         rawEntry     = section[2]
         self.entries = []
         self.old = old
+        self.title = str(self.day)+' '+monthConvert(self.month)
         entryRegEx   = re.compile(
                     r'{{(.*?)}}'
                     )
@@ -293,8 +294,6 @@ def main():
                         )
 
     nomPageText = nomPage.text
-    if backlog in nomPageText:
-        backlog = True
     nomPageSections = []
     old_noms = old_nom_regex.search(nomPageText).group(1)
     current_noms = current_regex.search(nomPageText).group(1)
@@ -314,7 +313,13 @@ def main():
         
     approved_num = 0
     closed_num = 0
+    
+    #DIAGNOSTIC#
+    sectionDebug = [x.title for x in nomPageSections]
+    print(sectionDebug)
     for section in nomPageSections:
+        print(section.title,[(x.title,x.approved) for x in section.entries])
+        #DIAGNOSTIC#
         toApproved = [entry for entry in section.entries if entry.approved]
         approved_num+=len(toApproved)
         closed_num += len([x for x in section.entries if x.closed])
