@@ -55,7 +55,7 @@ class DateHeading():
         
     def printSection(self,comment=''):
         if len(self.entries) < 1:
-            print(self.title)
+            print(self.title,'returned None')
             return('')
         if len(comment) > 0:
             comment = '<!-- %s -->\n'%comment
@@ -180,7 +180,7 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
         old_noms = [x for x in sectionList if x.old]
         current_noms = [x for x in sectionList if not x.old]
         for section in old_noms:
-            print(section.title)
+            print(section.title,len(section.entries))
             pageOutput += section.printSection(
                 comment='After you have created your nomination page, please '\
                         +'add it (e.g., {{Did you know nominations/YOUR '\
@@ -328,6 +328,8 @@ def main():
         else:
             stayOnNom  = [entry for entry in section.entries if not entry.approved]
         section.entries = stayOnNom
+        
+        print(section.title,len([entry for entry in section.entries if not entry.approved]))
         
         day = section.day
         month = section.month
