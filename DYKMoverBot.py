@@ -54,8 +54,12 @@ class DateHeading():
         self.entries = ent
         
     def printSection(self,comment=''):
-        print(self.entries)
-        if len(self.entries) < 1:
+        global rm_closed
+        if rm_closed:
+            toPrint = [x for x in self.entries if not x.approved and not x.closed]
+        else:
+            toPrint = [x for x in self.entries if not x.approved]
+        if len(toPrint) < 1:
             print(self.title,'returned None')
             return('')
         if len(comment) > 0:
@@ -65,7 +69,6 @@ class DateHeading():
         header = '\n===Articles created/expanded on %s %d===\n%s'%(monthConvert(self.month),self.day,comment)
         fmtdEntries = ['{{'+x+'}}' for x in [y.title for y in self.entries]]
         entries = '\n'.join(fmtdEntries)
-        print(self.title,len(entries),entries)
         return(header+entries)
 
 
@@ -181,7 +184,6 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
         old_noms = [x for x in sectionList if x.old]
         current_noms = [x for x in sectionList if not x.old]
         for section in old_noms:
-            print(section.title,len(section.entries))
             pageOutput += section.printSection(
                 comment='After you have created your nomination page, please '\
                         +'add it (e.g., {{Did you know nominations/YOUR '\
@@ -191,7 +193,6 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
             pageOutput += '\n'
         pageOutput += '==Current nominations<!-- automatically moved by bot -->=='
         for section in current_noms:
-            print(section.title)
             pageOutput += section.printSection(
                 comment='After you have created your nomination page, please '\
                         +'add it (e.g., {{Did you know nominations/YOUR '\
@@ -324,13 +325,6 @@ def main():
         toApproved = [entry for entry in section.entries if entry.approved]
         approved_num+=len(toApproved)
         closed_num += len([x for x in section.entries if x.closed])
-        if rm_closed:
-            stayOnNom = [e for e in section.entries if not e.approved and not e.closed]
-        else:
-            stayOnNom  = [entry for entry in section.entries if not entry.approved]
-        section.entries = stayOnNom
-        
-        print(section.title,len([e for e in section.entries if not e.approved and not e.closed]))
         
         day = section.day
         month = section.month
@@ -343,7 +337,6 @@ def main():
         else:
             approvedEntries = approvedPageSection[month][day].entries + toApproved
             approvedPageSection[month][day].setEntries(approvedEntries)
-        nomPageSections[i] = section
             
     if closed_num > 0:
         if rm_closed:
