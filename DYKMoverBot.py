@@ -318,7 +318,10 @@ def main():
     sectionDebug = [x.title for x in nomPageSections]
     print(sectionDebug)
     for section in nomPageSections:
-        print(section.title,[(x.title,x.approved) for x in section.entries])
+        print(section.title)
+        print([(x.title,x.approved) for x in section.entries])
+        print([(x.title,x.closed) for x in section.entries])
+        print([e.title for e in section.entries if not e.approved and not e.closed])
         #DIAGNOSTIC#
         toApproved = [entry for entry in section.entries if entry.approved]
         approved_num+=len(toApproved)
