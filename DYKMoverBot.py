@@ -54,6 +54,7 @@ class DateHeading():
         self.entries = ent
         
     def printSection(self,comment=''):
+        print(self.entries)
         if len(self.entries) < 1:
             print(self.title,'returned None')
             return('')
@@ -259,7 +260,7 @@ def writePage(sectionList,site,write,check_text,nomPage=False,summary='WugBot',b
     req_end = timeit.default_timer()
     if page.text == check_text:
         page.text = text
-        page.save(summary)
+        #page.save(summary)
         write_end = timeit.default_timer()
         stat = True
     else:
@@ -329,7 +330,7 @@ def main():
             stayOnNom  = [entry for entry in section.entries if not entry.approved]
         section.entries = stayOnNom
         
-        print(section.title,len([entry for entry in section.entries if not entry.approved]))
+        print(section.title,len([e for e in section.entries if not e.approved and not e.closed]))
         
         day = section.day
         month = section.month
