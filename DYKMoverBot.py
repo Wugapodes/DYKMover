@@ -133,6 +133,18 @@ class Entry():
             return(True)
         else:
             return(False)
+            
+    def __str__(self):
+        if self.approved:
+            a = 'Approved'
+        else:
+            a = 'Not approved'
+        if self.closed:
+            c = 'Closed'
+        else:
+            c = 'Not closed'
+        value = a + ' and ' + c
+        return(value)
 
 
 def monthConvert(name):
