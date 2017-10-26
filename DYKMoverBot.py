@@ -68,9 +68,9 @@ class DateHeading():
             else:
                 toPrint = [x for x in self.entries if not x.approved]
         if len(toPrint) < 1:
-            print(self.title,'returned None')
+            print(self.title,self.page,'returned None')
             for e in self.entries:
-                print(e.title,e)
+                print(e.title,str(e))
             return('')
         if len(comment) > 0:
             comment = '<!-- %s -->\n'%comment
@@ -273,6 +273,7 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
         return(pageOutput)
         
 def writePage(sectionList,site,write,check_text,nomPage=False,summary='WugBot',backlog=False):
+    global live
     if not nomPage:
         write = write+'/Approved'
         apText = check_text
@@ -286,7 +287,10 @@ def writePage(sectionList,site,write,check_text,nomPage=False,summary='WugBot',b
     req_end = timeit.default_timer()
     if page.text == check_text:
         page.text = text
-        #page.save(summary)
+        if live < -1:
+            print('Not writing, live = %s'%live)
+        else:
+            page.save(summary)
         write_end = timeit.default_timer()
         stat = True
     else:
