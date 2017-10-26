@@ -5,6 +5,7 @@ __version__ = '0.11.1-dev'
 
 import re
 import timeit
+from copy import copy
 
 import logging
 import pywikibot
@@ -20,7 +21,7 @@ live = -1
 rm_closed = True
 
 class DateHeading():
-    def __init__(self,section,site,old=None):
+    def __init__(self,section,site,old=None,page='nom'):
         self.month   = monthConvert(section[0])
         self.day     = int(section[1])
         self.year    = self.computeYear()
@@ -28,6 +29,7 @@ class DateHeading():
         rawEntry     = section[2]
         self.entries = []
         self.old = old
+        self.page = page
         self.title = str(self.day)+' '+monthConvert(self.month)
         entryRegEx   = re.compile(
                     r'{{(.*?)}}'
@@ -56,9 +58,15 @@ class DateHeading():
     def printSection(self,comment=''):
         global rm_closed
         if rm_closed:
-            toPrint = [x for x in self.entries if not x.approved and not x.closed]
+            if self.page == 'apr':
+                toPrint = [x for x in self.entries if x.approved and not x.closed]
+            else:
+                toPrint = [x for x in self.entries if not x.approved and not x.closed]
         else:
-            toPrint = [x for x in self.entries if not x.approved]
+            if self.page == 'apr':
+                toPrint = [x for x in self.entries if x.approved]
+            else:
+                toPrint = [x for x in self.entries if not x.approved]
         if len(toPrint) < 1:
             print(self.title,'returned None')
             print(self.entries)
@@ -348,7 +356,8 @@ def main():
         if month not in approvedPageSection:
             approvedPageSection[month] = {}
         if day not in approvedPageSection[month]:
-            approvedPageSection[month][day] = section
+            approvedPageSection[month][day] = copy(section)
+            approvedPageSection[month][day].page = 'apr'
             approvedPageSection[month][day].setEntries(toApproved)
         else:
             approvedEntries = approvedPageSection[month][day].entries + toApproved
