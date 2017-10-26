@@ -309,7 +309,7 @@ def main():
     #logging.info("style is set to %s" % style)
     #logging.info("DYKMoverBot version %s" % version)
     
-    if live == -1:
+    if live <= -1:
         read  = 'User:Wugapodes/DYKTest'
         write = 'User:Wugapodes/DYKTest'
     elif live == 0:
