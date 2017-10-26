@@ -69,7 +69,8 @@ class DateHeading():
                 toPrint = [x for x in self.entries if not x.approved]
         if len(toPrint) < 1:
             print(self.title,'returned None')
-            print(self.entries)
+            for e in self.entries:
+                print(e.title,e)
             return('')
         if len(comment) > 0:
             comment = '<!-- %s -->\n'%comment
