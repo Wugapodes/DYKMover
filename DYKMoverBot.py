@@ -4,6 +4,7 @@
 __version__ = '0.11.1-dev'
 
 import re
+import os
 import timeit
 from copy import copy
 
@@ -405,5 +406,31 @@ def main():
     
     with open('TimingData.csv','a') as f:
         f.write(','.join(times)+'\n')
+        
+    debugFileNom = './NomPageRationales.csv'
+    debugFileApr = './AprPageRationales.csv'
+    NomRationales = []
+    AprRationales = []
+    for s in nomPageSections:
+        for e in s.entries:
+            t = e.title
+            a = str(e.approved)
+            c = str(e.closed)
+            l = [t,c,a]
+            text = ','.join(l)
+            NomRationales.append(text)
+    for m in approvedPageSection:
+        for d in approvedPageSection[m]:
+            for e in approvedPageSection[m][d].entries:
+                t = e.title
+                a = str(e.approved)
+                c = str(e.closed)
+                l = [t,c,a]
+                text = ','.join(l)
+                AprRationales.append(text)
+    with open(debugFileNom,'w') as df:
+        df.writelines(NomRationales)
+    with open(debugFileApr,'w') as df:
+        df.writelines(AprRAtionales)
     
 main()
