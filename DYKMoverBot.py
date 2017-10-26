@@ -421,14 +421,13 @@ def main():
             NomRationales.append(text)
     for m in approvedPageSection:
         for d in approvedPageSection[m]:
-            for s in approvedPageSection[m][d]:
-                for e in s:
-                    t = e.title
-                    a = str(e.approved)
-                    c = str(e.closed)
-                    l = [t,c,a]
-                    text = ','.join(l)
-                    AprRationales.append(text)
+            for s in approvedPageSection[m][d].entries:
+                t = e.title
+                a = str(e.approved)
+                c = str(e.closed)
+                l = [t,c,a]
+                text = ','.join(l)
+                AprRationales.append(text)
     with open(debugFileNom,'w') as df:
         df.writelines(NomRationales)
     with open(debugFileApr,'w') as df:
