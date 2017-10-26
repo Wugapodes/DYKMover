@@ -61,6 +61,7 @@ class DateHeading():
             toPrint = [x for x in self.entries if not x.approved]
         if len(toPrint) < 1:
             print(self.title,'returned None')
+            print(self.entries)
             return('')
         if len(comment) > 0:
             comment = '<!-- %s -->\n'%comment
@@ -70,6 +71,9 @@ class DateHeading():
         fmtdEntries = ['{{'+x+'}}' for x in [y.title for y in self.entries]]
         entries = '\n'.join(fmtdEntries)
         return(header+entries)
+        
+    def __len__(self):
+        return(len(self.entries))
 
 
 class Entry():
