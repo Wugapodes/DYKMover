@@ -57,23 +57,20 @@ class DateHeading():
     def setEntries(self,ent):
         self.entries = ent
         
-    def printSection(self,comment=''):
+    def printSection(self,apr=False,comment=''):
         global rm_closed
+        print(apr)
         if rm_closed:
-            if self.page == 'apr':
+            if apr:
                 toPrint = [x for x in self.entries if x.approved and not x.closed]
             else:
                 toPrint = [x for x in self.entries if not x.approved and not x.closed]
         else:
-            if self.page == 'apr':
+            if apr:
                 toPrint = [x for x in self.entries if x.approved]
             else:
                 toPrint = [x for x in self.entries if not x.approved]
-        if len(toPrint) < 1:
-            print(self.title,self.page,'returned None')
-            for e in self.entries:
-                print(e.title,str(e))
-            return('')
+        print(self.title,toPrint)
         if len(comment) > 0:
             comment = '<!-- %s-->\n'%comment
         else:
@@ -122,6 +119,7 @@ class Entry():
                 if '[[File:Symbol confirmed.svg|16px]]' in line \
                 or '[[File:Symbol voting keep.svg|16px]]' in line:
                     self.approved = True
+                    break
                 elif '[[File:Symbol question.svg|16px]]' in line \
                 or '[[File:Symbol possible vote.svg|16px]]' in line \
                 or '[[File:Symbol delete vote.svg|16px]]' in line \
@@ -212,6 +210,7 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
         current_noms = [x for x in sectionList if not x.old]
         for section in old_noms:
             pageOutput += section.printSection(
+                apr=False
                 comment='After you have created your nomination page, please '\
                         +'add it (e.g., {{Did you know nominations/YOUR '\
                         +'ARTICLE TITLE}}) to the TOP of this section (after '\
@@ -221,6 +220,7 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
         pageOutput += '==Current nominations<!-- automatically moved by bot -->=='
         for section in current_noms:
             pageOutput += section.printSection(
+                apr=False,
                 comment='After you have created your nomination page, please '\
                         +'add it (e.g., {{Did you know nominations/YOUR '\
                         +'ARTICLE TITLE}}) to the TOP of this section (after '\
@@ -268,7 +268,7 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
                +"recent ones at the bottom of each section. -->\n"
         pageOutput += head
         for section in sectionList:
-            pageOutput += section.printSection()
+            pageOutput += section.printSection(apr=True)
             pageOutput += '\n'
         holdingArea = re.search('(==Special occasion (?:.|\s)*]])',apText).group(0)
         pageOutput+=holdingArea
