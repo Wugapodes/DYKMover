@@ -75,7 +75,7 @@ class DateHeading():
                 print(e.title,str(e))
             return('')
         if len(comment) > 0:
-            comment = '<!-- %s -->\n'%comment
+            comment = '<!-- %s-->\n'%comment
         else:
             comment = ''
         header = '\n===Articles created/expanded on %s %d===\n%s'%(monthConvert(self.month),self.day,comment)
@@ -249,7 +249,7 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
                +"You Know]]'''.''\n"\
                +"\n"\
                +"[[Category:Wikipedia Did you know]]\n"\
-               +"[Category:Main Page discussions]]"
+               +"[[Category:Main Page discussions]]"
         pageOutput += foot
         return(pageOutput)
     elif not nomPage:
@@ -422,7 +422,7 @@ def main():
             NomRationales.append(text)
     for m in approvedPageSection:
         for d in approvedPageSection[m]:
-            for s in approvedPageSection[m][d].entries:
+            for e in approvedPageSection[m][d].entries:
                 t = e.title
                 a = str(e.approved)
                 c = str(e.closed)
