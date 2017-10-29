@@ -210,7 +210,7 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
         current_noms = [x for x in sectionList if not x.old]
         for section in old_noms:
             pageOutput += section.printSection(
-                apr=False
+                apr=False,
                 comment='After you have created your nomination page, please '\
                         +'add it (e.g., {{Did you know nominations/YOUR '\
                         +'ARTICLE TITLE}}) to the TOP of this section (after '\
