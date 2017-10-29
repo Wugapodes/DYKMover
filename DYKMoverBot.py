@@ -5,6 +5,7 @@ __version__ = '0.11.1-dev'
 
 import re
 import os
+import codecs
 import timeit
 from copy import copy
 
@@ -326,7 +327,7 @@ def main():
     old_nom_regex = re.compile(r'==Older nominations==\n((.*\n)*)==Current nominations')
     current_regex = re.compile(r'==Current nominations.*?==\n((.*\n)*)==Special')
     sectionRegEx = re.compile(
-                        r'===.*? on (.*?) (\d+)===\n(?:|<!--.*?-->)(?:|\n+)({{(?:.*\n)+?)(?===)'
+                        r'===.*? on (.*?) (\d+)===\n(?:|<!--.*?-->)(?:|\n+)({{(?:.*\n?)+?)(?===|$)'
                         )
 
     nomPageText = nomPage.text
@@ -416,8 +417,8 @@ def main():
             t = e.title
             a = str(e.approved)
             c = str(e.closed)
-            l = [t,c,a]
-            text = ','.join(l)
+            l = [t,c,a,'\n']
+            text = u','.join(l)
             NomRationales.append(text)
     for m in approvedPageSection:
         for d in approvedPageSection[m]:
@@ -425,12 +426,12 @@ def main():
                 t = e.title
                 a = str(e.approved)
                 c = str(e.closed)
-                l = [t,c,a]
+                l = [t,c,a,'\n']
                 text = ','.join(l)
                 AprRationales.append(text)
-    with open(debugFileNom,'w') as df:
+    with codecs.open(debugFileNom,'w','utf-8') as df:
         df.writelines(NomRationales)
-    with open(debugFileApr,'w') as df:
-        df.writelines(AprRAtionales)
+    with codecs.open(debugFileApr,'w','utf-8') as df:
+        df.writelines(AprRationales)
     
 main()
