@@ -296,9 +296,9 @@ class PageSection():
         self.title = title
         self.old = old
         self.entries = []
-        self.set_groups(text,old,page)
+        self.set_groups(text,old)
 
-    def set_groups(self,text,old,page):
+    def set_groups(self,text,old):
         global section_regex
         entries = self.entries
         for section in section_regex.findall(text):
