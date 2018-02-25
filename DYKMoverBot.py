@@ -62,6 +62,10 @@ class DateHeading():
     def __init__(self,section,**kwargs):
         old = kwargs['old']
         page = kwargs['page']
+        if 'Approved nominations' == page:
+            page = 'apr'
+        else:
+            page = 'nom'
         if section == None:
             self.month = kwargs['month']
             self.day = kwargs['day']
@@ -298,7 +302,7 @@ class PageSection():
         global section_regex
         entries = self.entries
         for section in section_regex.findall(text):
-            entries.append(DateHeading(section,old=old,page=page))
+            entries.append(DateHeading(section,old=old,page=self.title))
         self.entries = entries
 
     def _move(self,t_page,section,nom):
@@ -321,8 +325,8 @@ class PageSection():
 
 
 class NomPageSection(PageSection):
-    def __init__(self,*args,page=None):
-        PageSection.__init__(self,*args,page=page)
+    def __init__(self,*args):
+        PageSection.__init__(self,*args)
         self.approved_num = None
         self.closed_num = None
 
@@ -342,7 +346,7 @@ class NomPageSection(PageSection):
 
 class AprPageSection(PageSection):
     def __init__(self,*args):
-        PageSection.__init__(self,*args,page='approved')
+        PageSection.__init__(self,*args)
         self.unapproved_num = None
         self.closed_num = None
 
