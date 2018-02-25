@@ -177,7 +177,7 @@ class DateHeading():
         month = self.monthConvert(self.month)
         day = str(self.day)
         h_date = month+' '+day
-        if self.page = 'nom':
+        if self.page == 'nom':
             comment = '\n<!-- After you have created your nomination page, '\
                      +'please add it (e.g., {{Did you know nominations/YOUR '\
                      +'ARTICLE TITLE}}) to the TOP of this section (after '\
@@ -288,17 +288,17 @@ class Entry():
         return(string)
 
 class PageSection():
-    def __init__(self,title,old,text):
+    def __init__(self,title,old,text,page=None):
         self.title = title
         self.old = old
         self.entries = []
-        self.set_groups(text,old)
+        self.set_groups(text,old,page)
 
-    def set_groups(self,text,old):
+    def set_groups(self,text,old,page):
         global section_regex
         entries = self.entries
         for section in section_regex.findall(text):
-            entries.append(DateHeading(section,old))
+            entries.append(DateHeading(section,old=old,page=page))
         self.entries = entries
 
     def _move(self,t_page,section,nom):
@@ -320,9 +320,9 @@ class PageSection():
         return(out)
 
 
-class NomPageSection(PageSection)
-    def __init__(self,*args):
-        PageSection.__init__(self,*args)
+class NomPageSection(PageSection):
+    def __init__(self,*args,page=None):
+        PageSection.__init__(self,*args,page=page)
         self.approved_num = None
         self.closed_num = None
 
@@ -340,9 +340,9 @@ class NomPageSection(PageSection)
         self.closed_num = closed
 
 
-class AprPageSection(PageSection)
+class AprPageSection(PageSection):
     def __init__(self,*args):
-        PageSection.__init__(self,*args)
+        PageSection.__init__(self,*args,page='approved')
         self.unapproved_num = None
         self.closed_num = None
 
@@ -389,7 +389,7 @@ def writePages(read,write,n_text,a_text,checks,msgs):
             return(success,(req_start,req_end,write_end))
     n_page.text = n_text
     a_page.text = a_text
-    if live < -1:
+    if live <= -1:
         print('Not writing, live = %s'%live)
     else:
         n_page.save(n_summary)
@@ -429,8 +429,8 @@ def main():
     nomPageText = nomPage.text
     o_text = old_nom_regex.search(nomPageText).group(1)
     c_text = current_regex.search(nomPageText).group(1)
-    oldNoms = NomPageSection('Older nominations',True,o_text)
-    curNoms = NomPageSection('Current nominations',False,c_text)
+    oldNoms = NomPageSection('Older nominations',True,o_text,page='old')
+    curNoms = NomPageSection('Current nominations',False,c_text,page='cur')
 
     approvedPageText = approvedPage.text
     aprNoms = NomPageSection('Approved nominations',False,approvedPageText)
