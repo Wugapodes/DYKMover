@@ -292,7 +292,7 @@ class Entry():
         return(string)
 
 class PageSection():
-    def __init__(self,title,old,text,page=None):
+    def __init__(self,title,old,text):
         self.title = title
         self.old = old
         self.entries = []
@@ -433,8 +433,8 @@ def main():
     nomPageText = nomPage.text
     o_text = old_nom_regex.search(nomPageText).group(1)
     c_text = current_regex.search(nomPageText).group(1)
-    oldNoms = NomPageSection('Older nominations',True,o_text,page='old')
-    curNoms = NomPageSection('Current nominations',False,c_text,page='cur')
+    oldNoms = NomPageSection('Older nominations',True,o_text)
+    curNoms = NomPageSection('Current nominations',False,c_text)
 
     approvedPageText = approvedPage.text
     aprNoms = NomPageSection('Approved nominations',False,approvedPageText)
