@@ -15,7 +15,7 @@ import datetime
 
 ########
 # Changing this to 1 makes your changes live on the report page, do not set to
-# live mode unless you have been approved for bot usage. Do not merge commits 
+# live mode unless you have been approved for bot usage. Do not merge commits
 # where this is not default to 0
 ########
 live = -1
@@ -39,7 +39,7 @@ class DateHeading():
         entryOut     = entryRegEx.findall(rawEntry)
         for entry in entryOut:
             self.entries.append(Entry(entry,site))
-        
+
     def computeYear(self):
         '''
         Gives correct year over one year change, ie, for 11 months. Sections older
@@ -53,10 +53,10 @@ class DateHeading():
         else:
             year = cYear - 1
         return(year)
-        
+
     def setEntries(self,ent):
         self.entries = ent
-        
+
     def printSection(self,apr=False,comment=''):
         global rm_closed
         print(apr)
@@ -79,7 +79,7 @@ class DateHeading():
         fmtdEntries = ['{{'+x+'}}' for x in [y.title for y in self.entries]]
         entries = '\n'.join(fmtdEntries)
         return(header+entries)
-        
+
     def __len__(self):
         return(len(self.entries))
 
@@ -92,7 +92,7 @@ class Entry():
         self.approved = False
         self.closed   = False
         self.setApproval(pyWikiSite)
-        
+
     def setApproval(self,pyWikiSite):
         link = self.title
         link = link.replace('_',' ')
@@ -125,13 +125,13 @@ class Entry():
                 or '[[File:Symbol delete vote.svg|16px]]' in line \
                 or '[[File:Symbol redirect vote 4.svg|16px]]' in line:
                     self.approved = False
-                    
+
     def getApprovalStatus(self):
         return(self.approved)
-        
+
     def getClosedStatus(self):
         return(self.closed)
-    
+
     def computeDYKChecklistStatus(self,template):
         if type(template) is list:
             template='\n'.join(template)
@@ -142,8 +142,8 @@ class Entry():
             return(True)
         else:
             return(False)
-            
-    def __str__(self):
+
+    def info(self):
         if self.approved:
             a = 'Approved'
         else:
@@ -197,7 +197,7 @@ def monthConvert(name):
         elif name == 11: return('November')
         elif name == 12: return('December')
         else: raise ValueError
-        
+
 def printPage(sectionList,nomPage=False,apText=None,backlog=False):
     pageOutput = ''
     if nomPage:
@@ -273,7 +273,7 @@ def printPage(sectionList,nomPage=False,apText=None,backlog=False):
         holdingArea = re.search('(==Special occasion (?:.|\s)*]])',apText).group(0)
         pageOutput+=holdingArea
         return(pageOutput)
-        
+
 def writePage(sectionList,site,write,check_text,nomPage=False,summary='WugBot',backlog=False):
     global live
     if not nomPage:
@@ -299,7 +299,7 @@ def writePage(sectionList,site,write,check_text,nomPage=False,summary='WugBot',b
         write_end = timeit.default_timer()
         stat = False
     return(stat,(req_start,req_end,write_end))
-        
+
 def main():
     global live
     global rm_closed
@@ -310,7 +310,7 @@ def main():
     #logging.info("live is set to %s" % live)
     #logging.info("style is set to %s" % style)
     #logging.info("DYKMoverBot version %s" % version)
-    
+
     if live <= -1:
         read  = 'User:Wugapodes/DYKTest'
         write = 'User:Wugapodes/DYKTest'
@@ -347,19 +347,19 @@ def main():
             approvedPageSection[sect.month] = {}
         if sect.day not in approvedPageSection[sect.month]:
             approvedPageSection[sect.month][sect.day] = sect
-        
+
     approved_num = 0
     closed_num = 0
-    
+
     for i in range(len(nomPageSections)):
         section = nomPageSections[i]
         toApproved = [entry for entry in section.entries if entry.approved]
         approved_num+=len(toApproved)
         closed_num += len([x for x in section.entries if x.closed])
-        
+
         day = section.day
         month = section.month
-        
+
         if month not in approvedPageSection:
             approvedPageSection[month] = {}
         if day not in approvedPageSection[month]:
@@ -369,7 +369,7 @@ def main():
         else:
             approvedEntries = approvedPageSection[month][day].entries + toApproved
             approvedPageSection[month][day].setEntries(approvedEntries)
-            
+
     if closed_num > 0:
         if rm_closed:
             c_msg = str(closed_num)+' closed nominations removed.'
@@ -382,7 +382,7 @@ def main():
     nomPageSections.sort(key=lambda x:x.date)
     approvedSectionList = [approvedPageSection[m][d] for m in approvedPageSection.keys() for d in approvedPageSection[m].keys()]
     approvedSectionList.sort(key=lambda x:x.date)
-    
+
     if '{{backlog}}' in nomPageText:
         backlog = True
     else:
@@ -397,17 +397,17 @@ def main():
                                 backlog=backlog
                                 )
     apr_stat,apr_times=writePage(approvedSectionList,site,write,approvedPage.text,summary=editsum)
-    
+
     nom_write_total = nom_times[2] - nom_times[0]
     nom_write_proper = nom_times[2] - nom_times[1]
     apr_write_total = apr_times[2] - apr_times[0]
     apr_write_proper = apr_times[2] - apr_times[1]
     times = [nom_write_total,nom_write_proper,apr_write_total,apr_write_proper]
     times = [str(x) for x in times]
-    
+
     with open('TimingData.csv','a') as f:
         f.write(','.join(times)+'\n')
-        
+
     debugFileNom = './NomPageRationales.csv'
     debugFileApr = './AprPageRationales.csv'
     NomRationales = []
@@ -433,5 +433,5 @@ def main():
         df.writelines(NomRationales)
     with codecs.open(debugFileApr,'w','utf-8') as df:
         df.writelines(AprRationales)
-    
+
 main()
