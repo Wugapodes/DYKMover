@@ -83,7 +83,10 @@ class DateHeading():
         self.entries = []
         self.old = old
         self.page = page
-        self.title = str(self.day)+' '+self.monthConvert(self.month)
+        try:
+            self.title = str(self.day)+' '+self.monthConvert(self.month)
+        except:
+            print(section)
         entryRegEx   = re.compile(
                     r'{{(.*?)}}'
                     )
@@ -368,6 +371,14 @@ class AprPageSection(PageSection):
         self.closed_num = closed
 
 
+def write_error(func_msg=None, cause_msg=None):
+    msg_template = "== WugBot Error ==\n"+\
+    "On "+str(datetime.date.today())+" at "+\
+    str(datetime.datetime.utcnow().time()).split('.')[0]+" UTC WugBot "+\
+    "encountered "+func_msg+"\n\n"+\
+    "The error seems to have "+cause_msg"\n"+\
+    "{{ping|Wugapodes}} ~~~~"
+
 def writePages(read,write,n_text,a_text,checks,msgs):
     global site
     global live
@@ -524,4 +535,13 @@ def main():
 
     return(success)
 
-main()
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        e_name = typr(e).__name__
+        e_msg = e.message
+        fm = "an error in the {{mono|main}} function."
+        cm = "been caused by a "+e_name+". See the logs for more info."
+        write_error(fm,cm)
+        exit()
