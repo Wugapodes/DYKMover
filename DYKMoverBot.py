@@ -62,6 +62,9 @@ class DateHeading():
     def __init__(self,section,**kwargs):
         old = kwargs['old']
         page = kwargs['page']
+        self.old = old
+        self.page = page
+        self.entries = []
         if 'Approved nominations' == page:
             page = 'apr'
         else:
@@ -72,27 +75,26 @@ class DateHeading():
             self.year = kwargs['year']
             self.date = kwargs['date']
             self.entries = kwargs['entries']
-            self.title = kwargs['title']
-            self.old = old
-            self.page = page
-        self.month   = self.monthConvert(section[0])
-        self.day     = int(section[1])
-        self.year    = self.computeYear()
-        self.date    = datetime.date(month=self.month,day=self.day,year=self.year)
-        rawEntry     = section[2]
-        self.entries = []
-        self.old = old
-        self.page = page
-        try:
-            self.title = str(self.day)+' '+self.monthConvert(self.month)
-        except:
-            print(section)
-        entryRegEx   = re.compile(
-                    r'{{(.*?)}}'
-                    )
-        entryOut     = entryRegEx.findall(rawEntry)
-        for entry in entryOut:
-            self.entries.append(Entry(entry))
+            try:
+                self.title = kwargs['title']
+            except:
+                print(self.month,self.day,"No title?")
+        else:
+            self.month   = self.monthConvert(section[0])
+            self.day     = int(section[1])
+            self.year    = self.computeYear()
+            self.date    = datetime.date(month=self.month,day=self.day,year=self.year)
+            rawEntry     = section[2]
+            try:
+                self.title = str(self.day)+' '+self.monthConvert(self.month)
+            except:
+                print("EXCEPTION: ",section)
+            entryRegEx   = re.compile(
+                        r'{{(.*?)}}'
+                        )
+            entryOut     = entryRegEx.findall(rawEntry)
+            for entry in entryOut:
+                self.entries.append(Entry(entry))
 
     def computeYear(self):
         '''
@@ -210,6 +212,7 @@ class DateHeading():
         output['title'] = self.title
         output['old'] = self.old
         output['page'] = self.page
+        return(output)
 
     def __len__(self):
         return(len(self.entries))
@@ -376,7 +379,7 @@ def write_error(func_msg=None, cause_msg=None):
     "On "+str(datetime.date.today())+" at "+\
     str(datetime.datetime.utcnow().time()).split('.')[0]+" UTC WugBot "+\
     "encountered "+func_msg+"\n\n"+\
-    "The error seems to have "+cause_msg"\n"+\
+    "The error seems to have "+cause_msg+"\n"+\
     "{{ping|Wugapodes}} ~~~~"
 
 def writePages(read,write,n_text,a_text,checks,msgs):
@@ -539,7 +542,7 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        e_name = typr(e).__name__
+        e_name = type(e).__name__
         e_msg = e.message
         fm = "an error in the {{mono|main}} function."
         cm = "been caused by a "+e_name+". See the logs for more info."
