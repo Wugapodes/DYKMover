@@ -88,7 +88,7 @@ class DateHeading():
             try:
                 self.title = str(self.day)+' '+self.monthConvert(self.month)
             except:
-                print("EXCEPTION: ",section)
+                print(section)
             entryRegEx   = re.compile(
                         r'{{(.*?)}}'
                         )
@@ -345,7 +345,7 @@ class NomPageSection(PageSection):
                     closed += 1
                 if nom.approved:
                     num += 1
-                    PageSection._move(apr_page,section,nom)
+                    PageSection._move(self,apr_page,section,nom)
         self.approved_num = num
         self.closed_num = closed
 
