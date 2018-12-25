@@ -317,7 +317,7 @@ class PageSection():
                 s.entries.append(nom)
                 section.entries.remove(nom)
                 break
-        section_copy = dict(section)
+        section_copy = section.__dict__
         section_copy['entries'] = [nom]
         t_page.entries.append(DateHeading(None,**section_copy))
 
