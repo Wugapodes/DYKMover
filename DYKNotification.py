@@ -69,7 +69,7 @@ for nom in noms:
     if article.pageid == 0:
         print("Article does not exist")
         continue
-    elif article.isRedirect():
+    elif article.isRedirectPage():
         redirect = article.getRedirectTarget()
         article = pywikibot.Page(site,redirect)
     talk = article.toggleTalkPage()
@@ -86,7 +86,7 @@ for nom in noms:
                     continue
             except:
                 pass
-        talk_text = talk_text + "\n" + nom
+        talk_text = talk_text + "\n\n==Nomination at [[WP:DYK|Did you know]]==\n" + nom
     if live != 1:
         talk = pywikibot.Page(site,"User:WugBot/DYKNoteTest")
     talk.text = talk_text
