@@ -28,6 +28,8 @@ live        -1      Debug mode. Only reads from test pages. Does not write to
                       Bot Approval Group on the English Wikipedia.
 """
 live = -1
+_debug_n = 1
+_n=0
 
 site = pywikibot.Site('en', 'wikipedia')
 if live <= -1:
@@ -57,14 +59,19 @@ for line in all_lines:
         noms.append(line)
         
 for nom in noms:
-    pageTitle = re.search(r"{{.*?nominations\/(.*?)}}",nom).group(1)
-    article = pywikibot.Page(pageTitle)
+    if _n == _debug_n:
+        break
+    try:
+        pageTitle = re.search(r"{{.*?nominations\/(.*?)}}",nom).group(1)
+    except:
+        continue
+    article = pywikibot.Page(site,pageTitle)
     if article.pageid == 0:
         print("Article does not exist")
         continue
     elif article.isRedirect():
         redirect = article.getRedirectTarget()
-        article = pywikibot.Page(redirect)
+        article = pywikibot.Page(site,redirect)
     talk = article.toggleTalkPage()
     talk_text = talk.text
     if nom in talk_text:
@@ -80,6 +87,9 @@ for nom in noms:
             except:
                 pass
         talk_text = talk_text + "\n" + nom
+    if live != 1:
+        talk = pywikibot.Page(site,"User:WugBot/DYKNoteTest")
     talk.text = talk_text
     talk.save("This article has been nominated at [[WP:DYKN]] to be featured on the main page. WugBot v0.1.0-dev")
+    _n += 1
         
