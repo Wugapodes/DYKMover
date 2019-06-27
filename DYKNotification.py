@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-__version__ = '0.1.0-dev'
+__version__ = '0.2.0-dev'
 
 import re
 import os
@@ -99,7 +99,8 @@ for nom in noms:
         talk_text = talk_text \
             + "\n\n==Nomination at [[WP:DYK|Did you know]]==\n" \
             + ":''This review is [[WP:transclusion|transcluded]] from " \
-            + "[[" + pageTitle + "]]. You may review or comment on the " \
+            + "[[Template:Did you know nominations/" + pageTitle + "]]. "\
+            + "You may review or comment on the " \
             + "nomination by clicking ["+editLink(nom)+" here].''\n" \
             + nom
     if live != 1:
