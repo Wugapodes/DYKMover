@@ -27,9 +27,17 @@ live        -1      Debug mode. Only reads from test pages. Does not write to
                       This mode should not be used without approval from the
                       Bot Approval Group on the English Wikipedia.
 """
-live = -1
+live = 0
 _debug_n = 1
 _n=0
+
+def editLink(nom):
+    pref = "https://en.wikipedia.org/w/index.php?title="
+    title = nom.lstrip("{").rstrip("}").strip().replace(" ","_")
+    action = "&action=edit"
+    url = pref + title + action
+    return(url)
+    
 
 site = pywikibot.Site('en', 'wikipedia')
 if live <= -1:
@@ -86,7 +94,12 @@ for nom in noms:
                     continue
             except:
                 pass
-        talk_text = talk_text + "\n\n==Nomination at [[WP:DYK|Did you know]]==\n" + nom
+        talk_text = talk_text \
+            + "\n\n==Nomination at [[WP:DYK|Did you know]]==\n" \
+            + ":''This review is [[WP:transclusion|transcluded]] from " \
+            + "[[" + pageTitle + "]]. You may review or comment on the " \
+            + "nomination by clicking ["+editLink(nom)+" here].''\n" \
+            + nom
     if live != 1:
         talk = pywikibot.Page(site,"User:WugBot/DYKNoteTest")
     talk.text = talk_text
