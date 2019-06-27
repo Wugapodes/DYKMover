@@ -33,6 +33,8 @@ _n=0
 
 def editLink(nom):
     pref = "https://en.wikipedia.org/w/index.php?title="
+    if "Template:" not in nom:
+        pref = pref+"Template:"
     title = nom.lstrip("{").rstrip("}").strip().replace(" ","_")
     action = "&action=edit"
     url = pref + title + action
