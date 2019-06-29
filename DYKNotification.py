@@ -1,13 +1,14 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-__version__ = '0.2.0-dev'
+__version__ = '0.2.1-dev'
 
 import re
 import os
 import codecs
 import timeit
 from copy import copy
+from random import shuffle
 
 import logging
 import pywikibot
@@ -28,7 +29,7 @@ live        -1      Debug mode. Only reads from test pages. Does not write to
                       Bot Approval Group on the English Wikipedia.
 """
 live = 0
-_debug_n = 1
+_debug_n = 5
 _n=0
 
 def editLink(nom):
@@ -68,12 +69,16 @@ for line in all_lines:
     elif "{{" in line:
         noms.append(line)
         
+# For Testing Purposes
+shuffle(noms)
+        
 for nom in noms:
     if _n == _debug_n:
         break
     try:
         pageTitle = re.search(r"{{.*?nominations\/(.*?)}}",nom).group(1)
     except:
+        print(nom)
         continue
     article = pywikibot.Page(site,pageTitle)
     if article.pageid == 0:
@@ -86,6 +91,7 @@ for nom in noms:
     talk_text = talk.text
     if nom in talk_text:
         print("Already notified")
+        continue
     else:
         if "{{nobots}}" in talk_text:
             continue
@@ -106,6 +112,6 @@ for nom in noms:
     if live != 1:
         talk = pywikibot.Page(site,"User:WugBot/DYKNoteTest")
     talk.text = talk_text
-    talk.save("This article has been nominated at [[WP:DYKN]] to be featured on the main page. WugBot v0.1.0-dev")
+    talk.save("This article has been nominated at [[WP:DYKN]] to be featured on the main page. WugBot v"+__version__)
     _n += 1
         
