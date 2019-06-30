@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-__version__ = '0.2.1-dev'
+__version__ = '0.3.0-dev'
 
 import re
 import os
@@ -103,12 +103,7 @@ for nom in noms:
             except:
                 pass
         talk_text = talk_text \
-            + "\n\n==Nomination at [[WP:DYK|Did you know]]==\n" \
-            + ":''This review is [[WP:transclusion|transcluded]] from " \
-            + "[[Template:Did you know nominations/" + pageTitle + "]]. "\
-            + "You may review or comment on the " \
-            + "nomination by clicking ["+editLink(nom)+" here].''\n" \
-            + nom
+            + "\n\n" + nom
     if live != 1:
         talk = pywikibot.Page(site,"User:WugBot/DYKNoteTest")
     talk.text = talk_text
