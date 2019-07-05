@@ -88,7 +88,7 @@ def main():
     all_lines = all_text.split("\n")
     noms = []
     for line in all_lines:
-        if is_nom(line)
+        if is_nom(line):
             noms.append(line)
             
     # For Testing Purposes
