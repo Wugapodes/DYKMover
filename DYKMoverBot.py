@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-__version__ = '0.11.1-dev'
+__version__ = '1.1.0-dev'
 
 import re
 import os
@@ -233,7 +233,7 @@ class Entry():
         if 'Template:' not in link:
             link = 'Template:'+link
         entryPage = pywikibot.Page(site,link)
-        if 'Please do not modify this page.' in entryPage.text:
+        if 'Please do not modify' in entryPage.text:
             self.closed = True
             return()
         dykchecklist = []
@@ -451,7 +451,7 @@ def main():
     curNoms = NomPageSection('Current nominations',False,c_text)
 
     approvedPageText = approvedPage.text
-    aprNoms = NomPageSection('Approved nominations',False,approvedPageText)
+    aprNoms = AprPageSection('Approved nominations',False,approvedPageText)
 
     oldNoms.move_entries(aprNoms)
     curNoms.move_entries(aprNoms)
