@@ -36,7 +36,7 @@ rm_closed    True   Closed nominations are removed from pages automatically by
              False  Closed nominations are not removed by the bot and must be
                       removed by a human.
 """
-live = -1
+live = 0
 two_way = True
 rm_closed = True
 
@@ -116,7 +116,7 @@ class DateHeading():
     def printSection(self,apr=False,comment=''):
         global rm_closed
 
-        print(apr)
+        #print(apr)
         if rm_closed:
             if apr:
                 toPrint = [x for x in self.entries if x.approved and not x.closed]
@@ -127,7 +127,7 @@ class DateHeading():
                 toPrint = [x for x in self.entries if x.approved]
             else:
                 toPrint = [x for x in self.entries if not x.approved]
-        print(self.title,toPrint)
+        #print(self.title,toPrint)
         if len(comment) > 0:
             comment = '<!-- %s-->\n'%comment
         else:
@@ -150,39 +150,40 @@ class DateHeading():
             name = int(name)
         except ValueError:
             name = str(name)
-            if type(name) is str:
-                name
-                if name == "January": return 1
-                elif name == "February": return 2
-                elif name == "March": return 3
-                elif name == "April": return 4
-                elif name == "May": return 5
-                elif name == "June": return 6
-                elif name == "July": return 7
-                elif name == "August": return 8
-                elif name == "September": return 9
-                elif name == "October": return 10
-                elif name == "November": return 11
-                elif name == "December": return 12
-                else: raise ValueError
-            elif type(name) is int:
-                if name == 1:return('January')
-                elif name == 2:return('February')
-                elif name == 3:return('March')
-                elif name == 4:return('April')
-                elif name == 5:return('May')
-                elif name == 6:return('June')
-                elif name == 7:return('July')
-                elif name == 8:return('August')
-                elif name == 9:return('September')
-                elif name == 10:return('October')
-                elif name == 11: return('November')
-                elif name == 12: return('December')
-                else: raise ValueError
+        if type(name) is str:
+            if name == "January": return 1
+            elif name == "February": return 2
+            elif name == "March": return 3
+            elif name == "April": return 4
+            elif name == "May": return 5
+            elif name == "June": return 6
+            elif name == "July": return 7
+            elif name == "August": return 8
+            elif name == "September": return 9
+            elif name == "October": return 10
+            elif name == "November": return 11
+            elif name == "December": return 12
+            else: raise ValueError
+        elif type(name) is int:
+            if name == 1:return('January')
+            elif name == 2:return('February')
+            elif name == 3:return('March')
+            elif name == 4:return('April')
+            elif name == 5:return('May')
+            elif name == 6:return('June')
+            elif name == 7:return('July')
+            elif name == 8:return('August')
+            elif name == 9:return('September')
+            elif name == 10:return('October')
+            elif name == 11: return('November')
+            elif name == 12: return('December')
+            else: raise ValueError
 
     def __str__(self):
         global rm_closed
         lines = []
+        #print(self.day)
+        #print(self.month)
         month = self.monthConvert(self.month)
         day = str(self.day)
         h_date = month+' '+day
@@ -202,14 +203,17 @@ class DateHeading():
         out = '\n'.join(lines)
         return(out)
 
-    def __dict__(self):
+    def attr_out(self):
         output = {}
         output['month'] = self.month
         output['day'] = self.day
         output['year'] = self.year
         output['date'] = self.date
         output['entries'] = self.entries
-        output['title'] = self.title
+        try:
+            output['title'] = self.title
+        except:
+            output['title'] = str(self.day)+' '+self.monthConvert(self.month)
         output['old'] = self.old
         output['page'] = self.page
         return(output)
@@ -317,13 +321,15 @@ class PageSection():
                 s.entries.append(nom)
                 section.entries.remove(nom)
                 break
-        section_copy = section.__dict__
-        section_copy['entries'] = [nom]
-        t_page.entries.append(DateHeading(None,**section_copy))
+        #section_copy = section.attr_out()
+        #print(self.title)
+        #section_copy['entries'] = [nom]
+        #section_copy['title'] = self.title
+        #t_page.entries.append(DateHeading(None,**section_copy))
 
     def __str__(self):
         lines = []
-        lines.append('=='+title+'==')
+        lines.append('=='+self.title+'==')
         lines.append('<!-- automatically moved by bot -->')
         lines = lines + [str(x) for x in self.entries]
         out = '\n'.join(lines)
@@ -345,7 +351,8 @@ class NomPageSection(PageSection):
                     closed += 1
                 if nom.approved:
                     num += 1
-                    PageSection._move(self,apr_page,section,nom)
+                    #print(section.__dict__)
+                    self._move(apr_page,section,nom)
         self.approved_num = num
         self.closed_num = closed
 
@@ -368,8 +375,8 @@ class AprPageSection(PageSection):
                     if section.date in cur.entries:
                         nom_page = cur
                     else:
-                        nom_pge = old
-                    PageSection._move(nom_page,section,nom)
+                        nom_page = old
+                    self._move(nom_page,section,nom)
         self.unapproved_num = unapr
         self.closed_num = closed
 
@@ -388,9 +395,9 @@ def writePages(read,write,n_text,a_text,checks,msgs):
     nom_check = checks[0]
     apr_check = checks[1]
     na_msg = msgs['a']+'[[/Approved|approved page]]. '
-    nt_msg = msgs['t']+' removed.'
+    nt_msg = msgs['t']+'readded. '
     aa_msg = msgs['a']+'approved page. '
-    at_msg = msgs['t']+'[[WP:DYKN|removed]]. '
+    at_msg = msgs['t']+'moved to [[WP:DYKN|nom page]]. '
     c_msg = msgs['c']
     v_msg = msgs['v']
     n_summary = na_msg+nt_msg+c_msg+v_msg
@@ -525,7 +532,7 @@ def main():
         'c': c_msg,
         'v': v_msg
     }
-    success, time = writePages(read,write,new_nom_page,new_apr_page,checks,msgs)
+    success, time = writePages(read,write,new_nom_page,new_apr_page,page_checks,msgs)
 
     write_time = time[2] - time[0]
     read_time = time[1] - time[0]
@@ -548,3 +555,4 @@ if __name__ == "__main__":
         cm = "been caused by a "+e_name+". See the logs for more info."
         write_error(fm,cm)
         exit()
+
