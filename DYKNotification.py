@@ -96,7 +96,7 @@ def main():
         shuffle(noms)
             
     for nom in noms:
-        if _n == _debug_n:
+        if _n == _debug_n and _debug_n > 0:
             break
         try:
             pageTitle = re.search(r"{{.*?nominations\/(.*?)}}",nom).group(1)
@@ -105,7 +105,7 @@ def main():
             continue
         article = pywikibot.Page(site,pageTitle)
         if article.pageid == 0:
-            print("Article does not exist")
+            #Article does not exist
             continue
         elif article.isRedirectPage():
             redirect = article.getRedirectTarget()
