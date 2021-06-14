@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-__version__ = '1.1.0-dev'
+__version__ = '2.0.0-dev'
 
 import re
 import os
@@ -37,6 +37,7 @@ rm_closed    True   Closed nominations are removed from pages automatically by
                       removed by a human.
 """
 live = 0
+namespace = "Template:"
 two_way = True
 rm_closed = True
 
@@ -234,8 +235,8 @@ class Entry():
 
         link = self.title
         link = link.replace('_',' ')
-        if 'Template:' not in link:
-            link = 'Template:'+link
+        if namespace not in link:
+            link = namespace+link
         entryPage = pywikibot.Page(site,link)
         if 'Please do not modify' in entryPage.text:
             self.closed = True
@@ -298,7 +299,10 @@ class Entry():
         return(value)
 
     def __str__(self):
-        string = '{{Template:'+self.title+'}}'
+        if namespace == "Template:":
+            string = '{{Template:'+self.title+'}}'
+        else:
+            string = '{{Wikipedia:'+self.title+'}}'
         return(string)
 
 class PageSection():
@@ -437,15 +441,22 @@ def main():
     #logging.info("style is set to %s" % style)
     #logging.info("DYKMoverBot version %s" % version)
 
+    if namespace == "Template:":
+        io_prefix = "Template talk:"
+        io_postfix = ""
+    else:
+        io_prefix = "Wikipedia"
+        io_postfix = " nominations"
+
     if live <= -1:
         read  = 'User:Wugapodes/DYKTest'
         write = 'User:Wugapodes/DYKTest'
     elif live == 0:
-        read  = 'Template talk:Did you know'
+        read  = io_prefix + 'Did you know' + io_postfix
         write = 'User:Wugapodes/DYKTest'
     elif live == 1:
-        read  = 'Template talk:Did you know'
-        write = 'Template talk:Did you know'
+        read  = io_prefix + 'Template talk:Did you know' + io_postfix
+        write = io_prefix + 'Template talk:Did you know' + io_postfix
 
     nomPage = pywikibot.Page(site,read)
     approvedPage = pywikibot.Page(site,read+'/Approved')
@@ -553,6 +564,6 @@ if __name__ == "__main__":
         e_msg = e.message
         fm = "an error in the {{mono|main}} function."
         cm = "been caused by a "+e_name+". See the logs for more info."
-        write_error(fm,cm)
+        # write_error(fm,cm)
         exit()
 

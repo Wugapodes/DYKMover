@@ -26,14 +26,15 @@ live         0      Testing mode. Reads from the live DYKN pages. Writes to
                       This mode should not be used without approval from the
                       Bot Approval Group on the English Wikipedia.
 """
-live = 1
+live = 0
+namespace = "Template:"
 _debug_n = 5
 _n=0
 
 def editLink(nom):
     pref = "https://en.wikipedia.org/w/index.php?title="
-    if "Template:" not in nom:
-        pref = pref+"Template:"
+    if namespace not in nom:
+        pref = pref+namespace
     title = nom.lstrip("{").rstrip("}").strip().replace(" ","_")
     action = "&action=edit"
     url = pref + title + action
@@ -65,7 +66,10 @@ def excluded(text):
         
 def pages(live,test_page='User:WugBot/DYKNoteTest'):
     if live == 1:
-        read  = 'Template talk:Did you know'
+        if namespace == "Template:":
+            read  = 'Template talk:Did you know'
+        else:
+            read = 'Wikipedia:Did you know nominations'
         write = None
     else:
         read = test_page
