@@ -26,7 +26,7 @@ live         0      Testing mode. Reads from the live DYKN pages. Writes to
                       This mode should not be used without approval from the
                       Bot Approval Group on the English Wikipedia.
 """
-live = 0
+live = 1
 _debug_n = 5
 _n=0
 
@@ -108,8 +108,12 @@ def main():
             #Article does not exist
             continue
         elif article.isRedirectPage():
-            redirect = article.getRedirectTarget()
-            article = pywikibot.Page(site,redirect)
+            redirect = article.getRedirectTarget().title()
+            try:
+                article = pywikibot.Page(site,redirect)
+            except:
+                print("Could not retrieve redirect target "+redirect)
+                continue
         talk = article.toggleTalkPage()
         talk_text = talk.text
         if already_notified(talk_text):
@@ -117,7 +121,7 @@ def main():
             continue
         if excluded(talk_text):
             continue
-        talk_text = talk_text + "\n\n" + nom
+        talk_text = talk_text + "\n\n==Did you know nomination==\n" + nom
         if live != 1:
             talk = pywikibot.Page(site,write)
         talk.text = talk_text
