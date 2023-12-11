@@ -12,7 +12,7 @@ import sys
 # live mode unless you have been approved for bot usage. Do not merge commits 
 # where this is not default to 0
 ########
-live = 0
+live = 1
 ########
 # Style: 0 = with date sectionsl 1 = without
 ########
@@ -20,7 +20,7 @@ style = 0
 ########
 # Version Number
 ########
-version = '0.9.0'
+version = '0.9.2'
 ########
 
 '''
@@ -99,7 +99,7 @@ def checkPage(title):
     title = title.lstrip('{').rstrip('}')
     approved = computeNomStatus(title)
     if approved == -1:
-        #entries.pop()
+        entries.pop()
         if pageCnt == 0:
             nclosed+=1
         else:
@@ -128,7 +128,7 @@ def computeNomStatus(link,status=0):
         for line in page.text.split('\n'):
             if dykc == 1:
                 dykchecklist.append(line)
-                if '}}' in line:
+                if '}}' in line and '{{tq|' not in line:
                     dykc=0
                     status = computeDYKChecklistStatus('\n'.join(dykchecklist))
             elif '{{DYK checklist' in line:
@@ -137,6 +137,7 @@ def computeNomStatus(link,status=0):
                 else:
                     dykchecklist.append(line)
                     dykc = 1
+            line = line.replace('_',' ')
             if '[[File:Symbol confirmed.svg|16px]]' in line \
             or '[[File:Symbol voting keep.svg|16px]]' in line:
                 status = 1
@@ -227,14 +228,14 @@ def writeOut(p):
     nom = pywikibot.Page(site,read)
     np = nom.text  == nomPage.text
     if not ap and not np:
-        abort = 1
-        logging.error('Approved page and nom page has changed, '\
-                        +'aborting to avoid edit conflict')
-        page = pywikibot.Page(site,'User talk:WugBot')
-        page.text+='I ran into an edit conflict on both [[WP:DYKN/A]] and [[WP:DYKN]]'\
-            +' at ~~~~~ and did not write either page to avoid an edit conflict '\
-            +'~~~~'
-        page.save('Posting a note about failed test run due to edit conflict')
+        #abort = 1
+        #logging.error('Approved page and nom page has changed, '\
+        #                +'aborting to avoid edit conflict')
+        #page = pywikibot.Page(site,'User talk:WugBot')
+        #page.text+='I ran into an edit conflict on both [[WP:DYKN/A]] and [[WP:DYKN]]'\
+        #    +' at ~~~~~ and did not write either page to avoid an edit conflict '\
+        #    +'~~~~'
+        #page.save('Posting a note about failed test run due to edit conflict')
         return()
     if not ap:
         abort = 1
@@ -359,9 +360,15 @@ sectionName = ''
 approvedPageDates = []
 oldLine = ''
 datesToRemove = []
+SOHA_latch = True
 if style != 1:
     logging.info("Starting style 0 parsing")
     for line in approvedPageText:
+        if SOHA_latch and '==Approved' in line:
+            SOHA_latch = False
+        elif SOHA_latch:
+            continue
+
         if '==Articles' in line:
             mergeNominations(oldLine)
             matches=dateRegex.search(line)
@@ -406,8 +413,6 @@ if style != 1:
                         nclosed+=1
                     else:
                         aclosed+=1
-        if '==Special occasion holding area==' in line:
-            break
     adts = [x[0] for x in approvedPageDates]
     newSections = [x for x in dates if x[0] not in adts]
     approvedPageDates+=newSections
@@ -420,26 +425,32 @@ if style != 1:
 # Create the page text to be output
 logging.info("Creating output text")
 passed = 0
+SOHA_text = []
+
+SOHA_latch = False
+for line in approvedPage.text.split('\n'):
+    if '==Special occasion holding area==' in line:
+        SOHA_latch = True
+        SOHA_text.append(line)
+    elif SOHA_latch and '==Approved' in line:
+        SOHA_latch = False
+        break
+    elif SOHA_latch:
+        SOHA_text.append(line)
 approvedText = [
         "{{/top}}\n",
         "=Nominations=\n",
-        "==Approved nominations==\n",
+        '\n'.join(SOHA_text),
+        "\n==Approved nominations==\n",
         "<!-- This section will hold approved nominations, with the templates "\
         +"transcluded in the same manner as the regular nominations page. "\
         +"While the exact format of the section has not yet been decided-while"\
         +" it seems unlikely that it will be by date, it may be divided into "\
         +"other sections-it is likely that the oldest approvals will go at the"\
-        +" top and the most recent ones at the bottom of each section. -->\n"
+        +" top and the most recent ones at the bottom of each section. -->\n",
+        '\n'.join(toPrint)
     ]
 
-approvedText.append('\n'.join(toPrint))
-for line in approvedPage.text.split('\n'):
-    if '==Special occasion holding area==' in line:
-        passed = 1
-        approvedText.append('\n'+line+'\n')
-    elif passed == 1:
-        approvedText.append(line+'\n')
-        
 writeOut(write)
     
 print('Done')
